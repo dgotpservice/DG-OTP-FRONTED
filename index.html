@@ -1,0 +1,26 @@
+async function fetchServices() {
+    const select = document.getElementById('smsSvc');
+    const country = document.getElementById('countrySelect').value;
+    select.innerHTML = "<option>🔍 Loading Services...</option>";
+    
+    try {
+        console.log("Fetching from:", `${BACKEND}/get-all-services?country=${country}`);
+        const res = await fetch(`${BACKEND}/get-all-services?country=${country}`);
+        
+        if (!res.ok) throw new Error("Backend connection failed");
+        
+        const data = await res.json();
+        console.log("Data received:", data);
+
+        if (data && data.length > 0) {
+            select.innerHTML = data.map(s => 
+                `<option value="${s.id}" data-rate="${s.rate}">${s.name} - ₹${s.rate}</option>`
+            ).join('');
+        } else {
+            select.innerHTML = "<option>No Services available for this country</option>";
+        }
+    } catch (e) {
+        console.error("Fetch Error:", e);
+        select.innerHTML = "<option>⚠️ Server Connection Error</option>";
+    }
+}
