@@ -1,0 +1,36 @@
+<script type="module">
+    // ... aapka baki firebase code yahan hoga ...
+
+    // 🚀 IS CODE KO YAHAN RAKHEIN
+    async function fetchServices() {
+        const select = document.getElementById('smsSvc');
+        const country = document.getElementById('countrySelect').value;
+        const BACKEND = "https://dg-otp-backend.onrender.com"; //
+
+        select.innerHTML = "<option>🔍 Loading Services...</option>";
+        
+        try {
+            const url = BACKEND + "/get-all-services?country=" + country;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Backend connection failed");
+            
+            const data = await res.json();
+            if (data && data.length > 0) {
+                let options = "";
+                data.forEach(service => {
+                    options += '<option value="' + service.id + '" data-rate="' + service.rate + '">' + 
+                               service.name + ' - ₹' + service.rate + '</option>';
+                });
+                select.innerHTML = options;
+            } else {
+                select.innerHTML = "<option>No Services available</option>";
+            }
+        } catch (e) {
+            console.error("Fetch Error:", e);
+            select.innerHTML = "<option>⚠️ Server Connection Error</option>";
+        }
+    }
+
+    // Is line ko bhi check karein taaki page load hote hi services aa jayein
+    window.onload = fetchServices;
+</script>
