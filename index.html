@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DG SMS SERVER</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <style>
+        body { background-color: #0b1120; color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 400px; margin: auto; background: #161e2e; padding: 20px; border-radius: 15px; border: 1px solid #1e293b; }
+        .balance-box { background: #1e293b; padding: 8px 15px; border-radius: 20px; color: #10b981; font-weight: bold; margin-bottom: 20px; }
+        select, input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; background: #1f2937; color: white; box-sizing: border-box; }
+        button { background: #2563eb; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .error-msg { color: #f59e0b; padding: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 style="color: #3b82f6;">DG SMS SERVER</h3>
+    <div class="balance-box" id="userBalance">₹0.00</div>
+
+    <select id="countrySelect">
+        <option value="0">India (+91)</option>
+    </select>
+
+    <select id="smsSvc">
+        <option>🔍 Loading Services...</option>
+    </select>
+
+    <button onclick="getOTP()">GET OTP NUMBER</button>
+    <div id="statusMsg" class="error-msg"></div>
+</div>
+
+<script>
+    // 1. Firebase Config
+    const firebaseConfig = {
+        databaseURL: "https://otp-service-74871-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const userUID = "8nfpc1ibBWOGasH830QTdhIOQb23";
+
+    // 2. Render Backend URL
+    const BACKEND = "https://dg-otp-backend.onrender.com";
+
+    // Realtime Balance Sync
+    database.ref('users/' + userUID + '/balance').on('value', (snapshot) => {
+        const bal = snapshot.val() || 0;
+        document.getElementById('userBalance').innerText = "₹" + parseFloat(bal).toFixed(2);
+    });
+
+    // Fetch Services
+    async function loadServices() {
+        const select = document.getElementById('smsSvc');
+        const status = document.getElementById('statusMsg');
+        try {
+            const res = await fetch(`${BACKEND}/get-all-services?country=0`);
+            if (!res.ok) throw new Error("Backend Response Error");
+            
+            const services = await res.json();
+            if (services.length === 0) {
+                select.innerHTML = "<option>No Services Available</option>";
+                return;
+            }
+
+            select.innerHTML = "";
+            services.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s.id;
+                opt.innerText = `${s.name} - ₹${s.rate}`;
+                select.appendChild(opt);
+            });
+            status.innerText = ""; // Clear error
+        } catch (e) {
+            console.error(e);
+            select.innerHTML = "<option>⚠️ Server Error</option>";
+            status.innerText = "Error: Check if Backend is Live and API Key is valid.";
+        }
+    }
+
+    loadServices();
+</script>
+
+</body>
+</html>
