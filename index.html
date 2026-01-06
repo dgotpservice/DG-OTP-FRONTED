@@ -20,17 +20,16 @@
 
 * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
-
 .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% -20%, #1e40af 0%, transparent 50%); }
 
-/* SLEEK MENU BUTTON */
+/* MENU TRIGGER */
 .menu-trigger {
     width: 38px; height: 38px; background: rgba(59, 130, 246, 0.1);
     border: 1px solid var(--primary); border-radius: 10px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
     cursor: pointer; transition: 0.3s;
 }
-.menu-trigger span { display: block; width: 18px; height: 1.5px; background: var(--primary); border-radius: 5px; }
+.menu-trigger span { display: block; width: 18px; height: 1.5px; background: var(--primary); border-radius: 10px; }
 
 .top-bar {
     padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
@@ -43,6 +42,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
 }
 
+/* SIDEBAR */
 .sidebar {
     position: fixed; top: 0; left: -240px; width: 230px; 
     height: 100%; background: #020617; border-right: 1px solid var(--border);
@@ -61,25 +61,21 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .premium-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 15px; }
-
 .input-style { width: 100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
-.input-style:focus { border-color: var(--primary); }
+.btn-glow { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
 
-.btn-glow {
-    width: 100%; padding: 14px; border: none; border-radius: 14px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
-    font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
-}
+/* SUPPORT CARDS */
+.sup-card { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 10px; text-decoration: none; color: #fff; }
+.sup-icon { font-size: 24px; width: 40px; text-align: center; }
 
-.bottom-nav {
-    position: fixed; bottom: 0; width: 100%; background: #0f172a;
-    display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;
-}
+/* ADMIN UI */
+.admin-user-row { border-bottom: 1px solid var(--border); padding: 10px 0; font-size: 13px; }
+.admin-actions { display: flex; gap: 5px; margin-top: 5px; }
+.btn-sm { padding: 5px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; color: #fff; }
+
+.bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0f172a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100; }
 .nav-tab { color: #64748b; font-size: 11px; text-align: center; cursor: pointer; }
 .nav-tab.active { color: var(--primary); }
-
-.admin-actions { display: flex; gap: 5px; margin-top: 10px; }
-.btn-sm { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -102,7 +98,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <input type="text" id="signupName" placeholder="Full Name" class="input-style">
             <input type="email" id="signupEmail" placeholder="Email" class="input-style">
             <input type="password" id="signupPass" placeholder="Password" class="input-style">
-            <button class="btn-glow" onclick="doSignup()">Register</button>
+            <button class="btn-glow" onclick="doSignup()">Create Account</button>
             <p onclick="toggleAuth(true)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">Back to Login</p>
         </div>
     </div>
@@ -111,9 +107,10 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 <div id="app" style="display:none">
     <div class="sidebar" id="sidebar">
         <h3 style="color:var(--primary); margin-bottom:20px">DG MENU</h3>
-        <div class="side-item active" onclick="openPage('home', this)">🏠 Home</div>
+        <div class="side-item active" onclick="openPage('home', this)">🏠 New Order</div>
         <div class="side-item" onclick="openPage('addfund', this)">💳 Add Fund</div>
         <div class="side-item" onclick="openPage('support', this)">🎧 Support</div>
+        <div class="side-item" onclick="openPage('profile', this)">👤 Profile</div>
         <div id="adminBtn" class="side-item" style="display:none; color:#f87171" onclick="openPage('admin', this)">🔐 Admin Panel</div>
         <div class="side-item" onclick="doLogout()" style="color:#ef4444; margin-top:30px">🚪 Logout</div>
     </div>
@@ -129,36 +126,41 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 
     <div id="home" class="page active">
         <div class="premium-card">
-            <h4 style="margin:0 0 15px 0">⚡ New Order</h4>
-            <label style="font-size:12px; color:#64748b">Category</label>
+            <h4>⚡ Create New Order</h4>
             <select id="catSelect" class="input-style" onchange="fetchServicesFromAPI()">
                 <option value="">Select Category</option>
                 <option value="Instagram">Instagram</option>
                 <option value="YouTube">YouTube</option>
+                <option value="Telegram">Telegram</option>
+                <option value="Facebook">Facebook</option>
             </select>
             <select id="srvSelect" class="input-style" onchange="calculateAutoPrice()">
                 <option value="">Choose Service</option>
             </select>
             <input type="text" id="orderLink" placeholder="Link / Username" class="input-style">
             <input type="number" id="orderQty" value="100" class="input-style" oninput="calculateAutoPrice()">
-            <div style="background:rgba(16, 185, 129, 0.1); padding:12px; border-radius:12px; border:1px dashed var(--accent); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-                <span style="color:#64748b">Price:</span>
-                <span style="color:var(--accent); font-weight:bold">₹<span id="totalPrice">0.00</span></span>
+            <div style="background:rgba(16, 185, 129, 0.1); padding:10px; border-radius:10px; display:flex; justify-content:space-between; margin-bottom:10px">
+                <span style="color:#64748b">Price:</span><span style="color:var(--accent); font-weight:bold">₹<span id="totalPrice">0.00</span></span>
             </div>
             <button class="btn-glow" id="orderBtn" onclick="placeFinalOrder()">Place Order</button>
         </div>
     </div>
 
-    <div id="admin" class="page">
-        <h3>🔐 Admin Panel</h3>
-        <div class="premium-card">
-            <h4>User Management</h4>
-            <div id="adminUserList"></div>
-        </div>
-        <div class="premium-card">
-            <h4>UTR Requests</h4>
-            <div id="adminPayments"></div>
-        </div>
+    <div id="support" class="page">
+        <h3>🎧 Contact Support</h3>
+        <a href="https://wa.me/917775965170" target="_blank" class="sup-card">
+            <span class="sup-icon">💬</span>
+            <div><b>WhatsApp Support</b><br><small>Click to chat</small></div>
+        </a>
+        <a href="https://t.me/dgservice_support" target="_blank" class="sup-card">
+            <span class="sup-icon">✈️</span>
+            <div><b>Telegram Support</b><br><small>Join our channel</small></div>
+        </a>
+        <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="sup-card">
+            <span class="sup-icon">📸</span>
+            <div><b>Instagram Support</b><br><small>Follow for updates</small></div>
+        </a>
+        <div id="adminAddedSupport"></div>
     </div>
 
     <div id="addfund" class="page">
@@ -168,10 +170,31 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <input type="number" id="amtInp" placeholder="Amount" class="input-style">
             <button class="btn-glow" onclick="genQR()">Generate QR</button>
             <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
-                <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
-                <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
-                <button class="btn-glow" onclick="submitPay()">Submit UTR</button>
+                <img id="qrImg" src="" style="border:4px solid white; border-radius:10px; width:180px">
+                <input type="text" id="utrInp" placeholder="UTR/Transaction ID" class="input-style" style="margin-top:12px">
+                <button class="btn-glow" onclick="submitUTR()">Confirm Payment</button>
             </div>
+        </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div class="premium-card" style="text-align:center">
+            <img id="uPfp" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--primary); margin-bottom:10px">
+            <h3 id="uName">User</h3>
+            <p id="uEmail" style="color:#64748b; font-size:14px"></p>
+            <button class="btn-glow" style="background:red; margin-top:30px; font-size:12px" onclick="deleteAccount()">Delete Account Forever</button>
+        </div>
+    </div>
+
+    <div id="admin" class="page">
+        <h3>🔐 Super Admin Dashboard</h3>
+        <div class="premium-card">
+            <h4>User Management (Edit Balance/Block)</h4>
+            <div id="adminUserList"></div>
+        </div>
+        <div class="premium-card">
+            <h4>Pending UTR Approval</h4>
+            <div id="adminPayments"></div>
         </div>
     </div>
 
@@ -183,6 +206,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 </div>
 
 <script>
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
     authDomain: "otp-service-74871.firebaseapp.com",
@@ -191,81 +215,119 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.database();
 
-// ONLY CHANGE: Restricted UID
-const ADMIN_UID = "8nfpc1ibBWOGasH830QTdhIOQb23";
+// ONLY THIS UID SEES ADMIN
+const MY_UID = "8nfpc1ibBWOGasH830QTdhIOQb23";
 const BACKEND_URL = "https://dg-otp-backend.onrender.com";
 
 auth.onAuthStateChanged(user => {
     if(user){
+        // Block check
+        db.ref('users/'+user.uid+'/status').on('value', s => {
+            if(s.val() === 'blocked'){ alert("Blocked!"); auth.signOut(); }
+        });
+
         document.getElementById('authBox').style.display='none';
         document.getElementById('app').style.display='block';
-        if(user.uid === ADMIN_UID) {
+        document.getElementById('uName').innerText = user.displayName || 'User';
+        document.getElementById('uEmail').innerText = user.email;
+        document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name="+user.email;
+        
+        if(user.uid === MY_UID) {
             document.getElementById('adminBtn').style.display='flex';
-            loadAdminData();
+            loadAdminPanel();
         }
+
         db.ref('users/' + user.uid + '/balance').on('value', s => document.getElementById('balText').innerText = (s.val() || 0).toFixed(2));
     } else {
         document.getElementById('authBox').style.display='flex'; document.getElementById('app').style.display='none';
     }
 });
 
-// UTR SUBMIT (Fixed Path)
-function submitPay() {
+// UTR SUBMISSION (FIXED FOR ADMIN RECEIPT)
+function submitUTR() {
     const amt = document.getElementById('amtInp').value;
     const utr = document.getElementById('utrInp').value;
-    if(!amt || !utr) return alert("Fill all fields");
+    if(!amt || !utr) return alert("Fill fields!");
     
+    // Using paymentRequests path consistently
     db.ref('paymentRequests').push({
         uid: auth.currentUser.uid,
         email: auth.currentUser.email,
-        amt: amt,
+        amt: parseFloat(amt),
         utr: utr,
-        status: 'pending'
+        status: 'pending',
+        timestamp: Date.now()
     }).then(() => {
-        alert("Submitted!");
+        alert("Request Sent to Admin!");
         document.getElementById('qrDiv').style.display='none';
-    });
+        document.getElementById('amtInp').value = '';
+        document.getElementById('utrInp').value = '';
+    }).catch(e => alert("Submission failed: " + e.message));
 }
 
-// ADMIN PANEL (Fixed Realtime Listener)
-function loadAdminData() {
+// ADMIN PANEL REALTIME LISTENER
+function loadAdminPanel() {
+    // Users Sync
     db.ref('users').on('value', snap => {
         let h = '';
         snap.forEach(u => {
-            h += `<div style="padding:10px; border-bottom:1px solid var(--border)">
-                ${u.val().email} (₹${u.val().balance || 0}) 
-                <button onclick="editBal('${u.key}')" style="float:right; background:var(--primary); color:white; border:none; border-radius:5px; padding:3px 8px;">Edit</button>
+            const d = u.val();
+            h += `<div class="admin-user-row">
+                <b>${d.email}</b><br>Bal: ₹${d.balance || 0} | Status: ${d.status || 'Active'}
+                <div class="admin-actions">
+                    <button class="btn-sm" style="background:var(--primary)" onclick="editBal('${u.key}')">Edit Bal</button>
+                    <button class="btn-sm" style="background:#f59e0b" onclick="toggleBlock('${u.key}','${d.status}')">Block/Unblock</button>
+                </div>
             </div>`;
         });
         document.getElementById('adminUserList').innerHTML = h;
     });
 
+    // UTR Sync
     db.ref('paymentRequests').on('value', snap => {
         let h = '';
         snap.forEach(p => {
             const req = p.val();
-            if(req.status === 'pending') {
-                h += `<div class="premium-card" style="font-size:13px">
-                    <b>${req.email}</b> sent ₹${req.amt}<br>UTR: ${req.utr}
+            if(req.status === 'pending'){
+                h += `<div class="premium-card" style="font-size:12px">
+                    <b>${req.email}</b> | ₹${req.amt}<br>UTR: ${req.utr}
                     <div class="admin-actions">
-                        <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})" class="btn-sm" style="background:var(--accent); color:white">Approve</button>
-                        <button onclick="rejectPay('${p.key}')" class="btn-sm" style="background:red; color:white">Reject</button>
+                        <button class="btn-sm" style="background:var(--accent)" onclick="approveUTR('${p.key}','${req.uid}',${req.amt})">Approve</button>
+                        <button class="btn-sm" style="background:red" onclick="rejectUTR('${p.key}')">Reject</button>
                     </div>
                 </div>`;
             }
         });
-        document.getElementById('adminPayments').innerHTML = h || 'No pending requests';
+        document.getElementById('adminPayments').innerHTML = h || 'No pending requests.';
     });
 }
 
-function approvePay(key, uid, amt) {
-    db.ref('users/' + uid + '/balance').transaction(c => (c || 0) + parseFloat(amt));
-    db.ref('paymentRequests/' + key + '/status').set('approved');
+function approveUTR(key, uid, amt){
+    db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
+    db.ref('paymentRequests/'+key+'/status').set('approved');
 }
-function rejectPay(key) { if(confirm("Reject?")) db.ref('paymentRequests/' + key).remove(); }
-function editBal(uid) { let a = prompt("New Balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+function rejectUTR(key){ if(confirm("Delete request?")) db.ref('paymentRequests/'+key).remove(); }
+function editBal(uid){ let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+function toggleBlock(uid, s){ db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
 
-// BACKEND SYNC
+// REST UI HELPERS
+function openPage(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    toggleSidebar(false);
+}
+function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
+function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+function genQR(){
+    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${document.getElementById('amtInp').value}%26cu=INR`;
+    document.getElementById('qrDiv').style.display='block';
+}
+function deleteAccount(){ if(confirm("Hamesha ke liye delete?")) { db.ref('users/'+auth.currentUser.uid).remove(); auth.currentUser.delete(); } }
+function doLogout(){ auth.signOut(); }
+function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
+function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
+function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0, status: 'active'})); }
+
 async function fetchServicesFromAPI() {
     const category = document.getElementById('catSelect').value;
     const srvSelect = document.getElementById('srvSelect');
@@ -285,25 +347,6 @@ function calculateAutoPrice() {
     const q = document.getElementById('orderQty').value || 0;
     document.getElementById('totalPrice').innerText = (p * (q/1000)).toFixed(2);
 }
-
-// UI HELPERS
-function openPage(id, el){
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    toggleSidebar(false);
-}
-function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
-function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-function genQR(){
-    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${amtInp.value}%26cu=INR`;
-    document.getElementById('qrDiv').style.display='block';
-}
-function doLogout(){ auth.signOut(); }
-function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
-function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
-function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> {
-    db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0});
-}); }
 </script>
 </body>
 </html>
