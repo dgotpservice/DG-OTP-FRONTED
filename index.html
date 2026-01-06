@@ -23,7 +23,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 
 .bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% -20%, #1e40af 0%, transparent 50%); }
 
-/* SLEEK SMALL MENU BUTTON */
 .menu-trigger {
     width: 38px; height: 38px; background: rgba(59, 130, 246, 0.1);
     border: 1px solid var(--primary); border-radius: 10px;
@@ -43,7 +42,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
 }
 
-/* SIDEBAR (COMPACT) */
 .sidebar {
     position: fixed; top: 0; left: -240px; width: 230px; 
     height: 100%; background: #020617; border-right: 1px solid var(--border);
@@ -59,7 +57,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 
 .page { display: none; padding: 15px; animation: fadeIn 0.3s ease; max-width: 550px; margin: auto; padding-bottom: 80px; }
 .page.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .premium-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 15px; }
 
@@ -72,18 +69,12 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
 }
 
-.price-container { display: flex; justify-content: space-between; align-items: center; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 12px; border: 1px dashed var(--accent); margin-bottom: 15px; }
-
-/* BOTTOM NAV */
 .bottom-nav {
     position: fixed; bottom: 0; width: 100%; background: #0f172a;
     display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;
 }
 .nav-tab { color: #64748b; font-size: 11px; text-align: center; cursor: pointer; }
 .nav-tab.active { color: var(--primary); }
-
-/* ADMIN SECTION */
-.admin-row { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -118,7 +109,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
         <div class="side-item active" onclick="openPage('home', this)">🏠 New Order</div>
         <div class="side-item" onclick="openPage('addfund', this)">💳 Add Fund</div>
         <div class="side-item" onclick="openPage('support', this)">🎧 Support</div>
-        <div class="side-item" onclick="openPage('profile', this)">👤 Profile</div>
         <div id="adminBtn" class="side-item" style="display:none; color:#f87171" onclick="openPage('admin', this)">🔐 Admin Panel</div>
         <div class="side-item" onclick="doLogout()" style="color:#ef4444; margin-top:30px">🚪 Logout</div>
     </div>
@@ -134,33 +124,22 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 
     <div id="home" class="page active">
         <div class="premium-card">
-            <h4 style="margin:0 0 15px 0">⚡ Create New Order</h4>
-            
-            <label style="font-size:12px; color:#64748b">Category</label>
+            <h4 style="margin:0 0 15px 0">⚡ New Order</h4>
             <select id="catSelect" class="input-style" onchange="fetchServicesFromAPI()">
                 <option value="">Select Category</option>
-                <option value="Instagram">Instagram Services</option>
-                <option value="YouTube">YouTube Services</option>
-                <option value="Telegram">Telegram Services</option>
-                <option value="Facebook">Facebook Services</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Telegram">Telegram</option>
             </select>
-
-            <label style="font-size:12px; color:#64748b">Service</label>
             <select id="srvSelect" class="input-style" onchange="calculateAutoPrice()">
                 <option value="">Choose Service</option>
             </select>
-
-            <label style="font-size:12px; color:#64748b">Link / Username</label>
             <input type="text" id="orderLink" placeholder="Enter link" class="input-style">
-
-            <label style="font-size:12px; color:#64748b">Quantity</label>
             <input type="number" id="orderQty" value="100" class="input-style" oninput="calculateAutoPrice()">
-
-            <div class="price-container">
-                <span style="font-size:14px; color:#64748b">Price:</span>
-                <span style="color:var(--accent); font-weight:bold; font-size:18px">₹<span id="totalPrice">0.00</span></span>
+            <div style="background:rgba(16, 185, 129, 0.1); padding:12px; border-radius:12px; border:1px dashed var(--accent); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+                <span style="color:#64748b">Amount:</span>
+                <span style="color:var(--accent); font-weight:bold">₹<span id="totalPrice">0.00</span></span>
             </div>
-
             <button class="btn-glow" id="orderBtn" onclick="placeFinalOrder()">Place Order</button>
         </div>
     </div>
@@ -168,11 +147,11 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     <div id="admin" class="page">
         <h3>🔐 Super Admin</h3>
         <div class="premium-card">
-            <h4>Users & Balance</h4>
+            <h4>User Balance Management</h4>
             <div id="adminUserList"></div>
         </div>
         <div class="premium-card">
-            <h4>UTR Requests</h4>
+            <h4>Pending UTR Requests</h4>
             <div id="adminPayments"></div>
         </div>
     </div>
@@ -180,29 +159,14 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     <div id="addfund" class="page">
         <div class="premium-card">
             <h3>💳 Add Funds</h3>
-            <p style="font-size:14px">UPI: <b style="color:var(--primary)">aqdaskhan03@fam</b></p>
+            <p>UPI: <b style="color:var(--primary)">aqdaskhan03@fam</b></p>
             <input type="number" id="amtInp" placeholder="Amount" class="input-style">
             <button class="btn-glow" onclick="genQR()">Generate QR</button>
             <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
                 <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
                 <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
-                <button class="btn-glow" onclick="submitPay()">Submit Payment</button>
+                <button class="btn-glow" onclick="submitPay()">Confirm Payment</button>
             </div>
-        </div>
-    </div>
-
-    <div id="support" class="page">
-        <h3>🎧 Support</h3>
-        <a href="https://wa.me/917775965170" target="_blank" class="premium-card" style="display:block; text-decoration:none;">💬 WhatsApp Chat</a>
-        <a href="https://t.me/dgservice_support" target="_blank" class="premium-card" style="display:block; text-decoration:none;">✈️ Telegram Support</a>
-        <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="premium-card" style="display:block; text-decoration:none;">📸 Instagram</a>
-    </div>
-
-    <div id="profile" class="page">
-        <div class="premium-card" style="text-align:center">
-            <img id="uPfp" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--primary); margin-bottom:10px">
-            <h3 id="uName">User</h3>
-            <p id="uEmail" style="color:#64748b"></p>
         </div>
     </div>
 
@@ -214,7 +178,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 </div>
 
 <script>
-// Firebase Setup
 const firebaseConfig = {
     apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
     authDomain: "otp-service-74871.firebaseapp.com",
@@ -225,32 +188,25 @@ const auth = firebase.auth(), db = firebase.database();
 const ADMIN_UID = "8nfpc1ibBWOGasH830QTdhIOQb23";
 const BACKEND_URL = "https://dg-otp-backend.onrender.com";
 
-// AUTH LISTENER
 auth.onAuthStateChanged(user => {
     if(user){
         document.getElementById('authBox').style.display='none';
         document.getElementById('app').style.display='block';
-        document.getElementById('uName').innerText = user.displayName || 'Guest';
-        document.getElementById('uEmail').innerText = user.email;
-        document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name="+user.email;
-        
         if(user.uid === ADMIN_UID) {
             document.getElementById('adminBtn').style.display='flex';
             loadAdminData();
         }
         db.ref('users/' + user.uid + '/balance').on('value', s => document.getElementById('balText').innerText = (s.val() || 0).toFixed(2));
     } else {
-        document.getElementById('authBox').style.display='flex';
-        document.getElementById('app').style.display='none';
+        document.getElementById('authBox').style.display='flex'; document.getElementById('app').style.display='none';
     }
 });
 
-// BACKEND API FUNCTIONS
+// BUYING FROM WEB (API CONNECT)
 async function fetchServicesFromAPI() {
     const category = document.getElementById('catSelect').value;
     const srvSelect = document.getElementById('srvSelect');
-    srvSelect.innerHTML = '<option>Loading services...</option>';
-    
+    srvSelect.innerHTML = '<option>Loading...</option>';
     try {
         const res = await fetch(`${BACKEND_URL}/get-services?category=${category}`);
         const data = await res.json();
@@ -274,14 +230,10 @@ async function placeFinalOrder() {
     const qty = document.getElementById('orderQty').value;
     const total = parseFloat(document.getElementById('totalPrice').innerText);
 
-    if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly");
-
     const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
     const currentBal = snap.val() || 0;
 
     if(currentBal < total) return alert("Insufficient Balance!");
-
-    document.getElementById('orderBtn').innerText = "Processing...";
 
     try {
         const res = await fetch(`${BACKEND_URL}/place-order`, {
@@ -290,43 +242,36 @@ async function placeFinalOrder() {
             body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
         });
         const data = await res.json();
-
         if(data.success) {
             db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
-            alert("Order Placed Successfully! Order ID: " + data.orderId);
-        } else {
-            alert("Error: " + data.message);
-        }
-    } catch(e) { alert("Backend server not responding"); }
-    document.getElementById('orderBtn').innerText = "Place Order";
+            alert("Order Placed! ID: " + data.orderId);
+        } else { alert(data.message); }
+    } catch(e) { alert("Server Error"); }
 }
 
-// ADMIN FUNCTIONS (MANUAL DATA CONTROL)
+// ADMIN DATA (FIXED UTR REQUESTS)
 function loadAdminData() {
-    // Users List
     db.ref('users').on('value', snap => {
         let h = '';
         snap.forEach(u => {
-            h += `<div class="admin-row">
-                <b>${u.val().email || 'User'}</b> (₹${u.val().balance || 0}) 
-                <button onclick="editBal('${u.key}')" style="background:var(--primary); border:none; color:white; border-radius:5px; padding:3px 8px; float:right">Edit</button>
+            h += `<div style="padding:10px; border-bottom:1px solid var(--border)">
+                ${u.val().email} (₹${u.val().balance || 0}) 
+                <button onclick="editBal('${u.key}')" style="float:right">Edit</button>
             </div>`;
         });
         document.getElementById('adminUserList').innerHTML = h;
     });
 
-    // Payment Requests Fixed
+    // LISTENING TO GLOBAL REQUESTS PATH
     db.ref('paymentRequests').on('value', snap => {
         let h = '';
         snap.forEach(p => {
             const req = p.val();
             if(req.status === 'pending') {
-                h += `<div class="premium-card" style="font-size:13px">
-                    <b>Email:</b> ${req.email || 'N/A'}<br>
-                    <b>Amount:</b> ₹${req.amt}<br>
-                    <b>UTR:</b> ${req.utr}<br>
-                    <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})" style="background:var(--accent); color:white; border:none; padding:5px; border-radius:5px; margin-top:5px">Approve</button>
-                    <button onclick="rejectPay('${p.key}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px; margin-top:5px">Reject</button>
+                h += `<div class="premium-card">
+                    ${req.email} sent ₹${req.amt}<br>UTR: ${req.utr}<br>
+                    <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})">Approve</button>
+                    <button onclick="rejectPay('${p.key}')">Reject</button>
                 </div>`;
             }
         });
@@ -334,61 +279,48 @@ function loadAdminData() {
     });
 }
 
-function editBal(uid) { let a = prompt("Set new balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
-
 function approvePay(key, uid, amt) {
-    db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
-    db.ref('paymentRequests/'+key+'/status').set('approved');
+    db.ref('users/' + uid + '/balance').transaction(c => (c||0) + parseFloat(amt));
+    db.ref('paymentRequests/' + key + '/status').set('approved');
+}
+function rejectPay(key) { db.ref('paymentRequests/' + key).remove(); }
+function editBal(uid) { let a = prompt("Balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+
+// FUND SUBMISSION (FIXED PATH)
+function submitPay() {
+    const amt = document.getElementById('amtInp').value;
+    const utr = document.getElementById('utrInp').value;
+    if(!amt || !utr) return alert("Fill fields!");
+    
+    db.ref('paymentRequests').push({
+        uid: auth.currentUser.uid,
+        email: auth.currentUser.email,
+        amt: amt,
+        utr: utr,
+        status: 'pending'
+    }).then(() => {
+        alert("Submitted!");
+        document.getElementById('qrDiv').style.display='none';
+    });
 }
 
-function rejectPay(key) { if(confirm("Reject this request?")) db.ref('paymentRequests/'+key).remove(); }
-
-// UI NAVIGATION
 function openPage(id, el){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     toggleSidebar(false);
 }
 function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
-
-function doGoogleAuth() { 
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider); 
-}
-
+function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 function genQR(){
-    const a = document.getElementById('amtInp').value;
-    if(!a || a <= 0) return alert("Enter amount first");
-    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${a}%26cu=INR`;
+    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${amtInp.value}%26cu=INR`;
     document.getElementById('qrDiv').style.display='block';
 }
-
-function submitPay(){
-    const amt = document.getElementById('amtInp').value;
-    const utr = document.getElementById('utrInp').value;
-    
-    if(!amt || !utr) return alert("Please fill amount and UTR number");
-
-    db.ref('paymentRequests').push({ 
-        uid: auth.currentUser.uid, 
-        email: auth.currentUser.email, 
-        amt: parseFloat(amt), 
-        utr: utr, 
-        status: 'pending' 
-    }).then(() => {
-        alert("UTR Submitted! Wait for Admin Approval.");
-        document.getElementById('qrDiv').style.display = 'none';
-        document.getElementById('amtInp').value = '';
-        document.getElementById('utrInp').value = '';
-    });
-}
-
+function doLogout(){ auth.signOut(); }
 function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
 function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
 function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> {
     db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0});
 }); }
-function doLogout(){ auth.signOut(); }
 </script>
 </body>
 </html>
