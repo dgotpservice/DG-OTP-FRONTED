@@ -1,6 +1,117 @@
- jjzuzhjxb    <div class="sidebar" id="sidebar">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DG SOCIAL SERVICE – Premium Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+:root {
+    --primary: #3b82f6;
+    --accent: #10b981;
+    --bg: #020617;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+* { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+.bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% -20%, #1e40af 0%, transparent 50%); }
+
+/* SLEEK MENU BUTTON */
+.menu-trigger {
+    width: 38px; height: 38px; background: rgba(59, 130, 246, 0.1);
+    border: 1px solid var(--primary); border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer; transition: 0.3s;
+}
+.menu-trigger span { display: block; width: 18px; height: 1.5px; background: var(--primary); border-radius: 5px; }
+
+.top-bar {
+    padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
+    background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
+}
+
+.wallet-box {
+    background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 50px;
+    border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+}
+
+.sidebar {
+    position: fixed; top: 0; left: -240px; width: 230px; 
+    height: 100%; background: #020617; border-right: 1px solid var(--border);
+    z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px 20px;
+}
+.sidebar.active { left: 0; box-shadow: 10px 0 40px rgba(0,0,0,0.7); }
+
+.side-item {
+    padding: 12px; border-radius: 10px; margin-bottom: 5px; cursor: pointer;
+    color: #94a3b8; display: flex; align-items: center; gap: 10px; font-size: 15px;
+}
+.side-item.active { background: rgba(59, 130, 246, 0.1); color: #fff; border: 1px solid var(--border); }
+
+.page { display: none; padding: 15px; animation: fadeIn 0.3s ease; max-width: 550px; margin: auto; padding-bottom: 80px; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.premium-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 15px; }
+
+.input-style { width: 100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
+.input-style:focus { border-color: var(--primary); }
+
+.btn-glow {
+    width: 100%; padding: 14px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
+    font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+}
+
+.bottom-nav {
+    position: fixed; bottom: 0; width: 100%; background: #0f172a;
+    display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100;
+}
+.nav-tab { color: #64748b; font-size: 11px; text-align: center; cursor: pointer; }
+.nav-tab.active { color: var(--primary); }
+
+.admin-actions { display: flex; gap: 5px; margin-top: 10px; }
+.btn-sm { padding: 6px 10px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div id="authBox" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="premium-card" style="width:100%; max-width:350px; text-align:center;">
+        <h2 style="color:var(--primary); margin:0;">DG SOCIAL SERVICE</h2>
+        <div id="loginForm" style="margin-top:20px">
+            <input type="email" id="loginEmail" placeholder="Email" class="input-style">
+            <input type="password" id="loginPass" placeholder="Password" class="input-style">
+            <button class="btn-glow" onclick="doLogin()">Sign In</button>
+            <button class="btn-glow" style="background:#fff; color:#000; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px" onclick="doGoogleAuth()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16"> Google Login
+            </button>
+            <p onclick="toggleAuth(false)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">New User? Register</p>
+        </div>
+        <div id="signupForm" style="display:none; margin-top:20px">
+            <input type="text" id="signupName" placeholder="Full Name" class="input-style">
+            <input type="email" id="signupEmail" placeholder="Email" class="input-style">
+            <input type="password" id="signupPass" placeholder="Password" class="input-style">
+            <button class="btn-glow" onclick="doSignup()">Register</button>
+            <p onclick="toggleAuth(true)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">Back to Login</p>
+        </div>
+    </div>
+</div>
+
+<div id="app" style="display:none">
+    <div class="sidebar" id="sidebar">
         <h3 style="color:var(--primary); margin-bottom:20px">DG MENU</h3>
-        <div class="side-item active" onclick="openPage('home', this)">🏠 New Order</div>
+        <div class="side-item active" onclick="openPage('home', this)">🏠 Home</div>
         <div class="side-item" onclick="openPage('addfund', this)">💳 Add Fund</div>
         <div class="side-item" onclick="openPage('support', this)">🎧 Support</div>
         <div id="adminBtn" class="side-item" style="display:none; color:#f87171" onclick="openPage('admin', this)">🔐 Admin Panel</div>
@@ -19,19 +130,19 @@
     <div id="home" class="page active">
         <div class="premium-card">
             <h4 style="margin:0 0 15px 0">⚡ New Order</h4>
+            <label style="font-size:12px; color:#64748b">Category</label>
             <select id="catSelect" class="input-style" onchange="fetchServicesFromAPI()">
                 <option value="">Select Category</option>
                 <option value="Instagram">Instagram</option>
                 <option value="YouTube">YouTube</option>
-                <option value="Telegram">Telegram</option>
             </select>
             <select id="srvSelect" class="input-style" onchange="calculateAutoPrice()">
                 <option value="">Choose Service</option>
             </select>
-            <input type="text" id="orderLink" placeholder="Enter link" class="input-style">
+            <input type="text" id="orderLink" placeholder="Link / Username" class="input-style">
             <input type="number" id="orderQty" value="100" class="input-style" oninput="calculateAutoPrice()">
             <div style="background:rgba(16, 185, 129, 0.1); padding:12px; border-radius:12px; border:1px dashed var(--accent); display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-                <span style="color:#64748b">Amount:</span>
+                <span style="color:#64748b">Price:</span>
                 <span style="color:var(--accent); font-weight:bold">₹<span id="totalPrice">0.00</span></span>
             </div>
             <button class="btn-glow" id="orderBtn" onclick="placeFinalOrder()">Place Order</button>
@@ -39,13 +150,13 @@
     </div>
 
     <div id="admin" class="page">
-        <h3>🔐 Super Admin</h3>
+        <h3>🔐 Admin Panel</h3>
         <div class="premium-card">
-            <h4>User Balance Management</h4>
+            <h4>User Management</h4>
             <div id="adminUserList"></div>
         </div>
         <div class="premium-card">
-            <h4>Pending UTR Requests</h4>
+            <h4>UTR Requests</h4>
             <div id="adminPayments"></div>
         </div>
     </div>
@@ -53,13 +164,13 @@
     <div id="addfund" class="page">
         <div class="premium-card">
             <h3>💳 Add Funds</h3>
-            <p>UPI: <b style="color:var(--primary)">aqdaskhan03@fam</b></p>
+            <p>UPI ID: <b style="color:var(--primary)">aqdaskhan03@fam</b></p>
             <input type="number" id="amtInp" placeholder="Amount" class="input-style">
             <button class="btn-glow" onclick="genQR()">Generate QR</button>
             <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
                 <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
                 <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
-                <button class="btn-glow" onclick="submitPay()">Confirm Payment</button>
+                <button class="btn-glow" onclick="submitPay()">Submit UTR</button>
             </div>
         </div>
     </div>
@@ -79,6 +190,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.database();
+
+// ONLY CHANGE: Restricted UID
 const ADMIN_UID = "8nfpc1ibBWOGasH830QTdhIOQb23";
 const BACKEND_URL = "https://dg-otp-backend.onrender.com";
 
@@ -96,7 +209,63 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// BUYING FROM WEB (API CONNECT)
+// UTR SUBMIT (Fixed Path)
+function submitPay() {
+    const amt = document.getElementById('amtInp').value;
+    const utr = document.getElementById('utrInp').value;
+    if(!amt || !utr) return alert("Fill all fields");
+    
+    db.ref('paymentRequests').push({
+        uid: auth.currentUser.uid,
+        email: auth.currentUser.email,
+        amt: amt,
+        utr: utr,
+        status: 'pending'
+    }).then(() => {
+        alert("Submitted!");
+        document.getElementById('qrDiv').style.display='none';
+    });
+}
+
+// ADMIN PANEL (Fixed Realtime Listener)
+function loadAdminData() {
+    db.ref('users').on('value', snap => {
+        let h = '';
+        snap.forEach(u => {
+            h += `<div style="padding:10px; border-bottom:1px solid var(--border)">
+                ${u.val().email} (₹${u.val().balance || 0}) 
+                <button onclick="editBal('${u.key}')" style="float:right; background:var(--primary); color:white; border:none; border-radius:5px; padding:3px 8px;">Edit</button>
+            </div>`;
+        });
+        document.getElementById('adminUserList').innerHTML = h;
+    });
+
+    db.ref('paymentRequests').on('value', snap => {
+        let h = '';
+        snap.forEach(p => {
+            const req = p.val();
+            if(req.status === 'pending') {
+                h += `<div class="premium-card" style="font-size:13px">
+                    <b>${req.email}</b> sent ₹${req.amt}<br>UTR: ${req.utr}
+                    <div class="admin-actions">
+                        <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})" class="btn-sm" style="background:var(--accent); color:white">Approve</button>
+                        <button onclick="rejectPay('${p.key}')" class="btn-sm" style="background:red; color:white">Reject</button>
+                    </div>
+                </div>`;
+            }
+        });
+        document.getElementById('adminPayments').innerHTML = h || 'No pending requests';
+    });
+}
+
+function approvePay(key, uid, amt) {
+    db.ref('users/' + uid + '/balance').transaction(c => (c || 0) + parseFloat(amt));
+    db.ref('paymentRequests/' + key + '/status').set('approved');
+}
+function rejectPay(key) { if(confirm("Reject?")) db.ref('paymentRequests/' + key).remove(); }
+function editBal(uid) { let a = prompt("New Balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+
+// BACKEND SYNC
 async function fetchServicesFromAPI() {
     const category = document.getElementById('catSelect').value;
     const srvSelect = document.getElementById('srvSelect');
@@ -112,92 +281,12 @@ async function fetchServicesFromAPI() {
 }
 
 function calculateAutoPrice() {
-    const pricePer1k = document.getElementById('srvSelect').value || 0;
-    const qty = document.getElementById('orderQty').value || 0;
-    document.getElementById('totalPrice').innerText = (pricePer1k * (qty/1000)).toFixed(2);
+    const p = document.getElementById('srvSelect').value || 0;
+    const q = document.getElementById('orderQty').value || 0;
+    document.getElementById('totalPrice').innerText = (p * (q/1000)).toFixed(2);
 }
 
-async function placeFinalOrder() {
-    const srv = document.getElementById('srvSelect');
-    const serviceId = srv.options[srv.selectedIndex].getAttribute('data-id');
-    const link = document.getElementById('orderLink').value;
-    const qty = document.getElementById('orderQty').value;
-    const total = parseFloat(document.getElementById('totalPrice').innerText);
-
-    const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
-    const currentBal = snap.val() || 0;
-
-    if(currentBal < total) return alert("Insufficient Balance!");
-
-    try {
-        const res = await fetch(`${BACKEND_URL}/place-order`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
-        });
-        const data = await res.json();
-        if(data.success) {
-            db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
-            alert("Order Placed! ID: " + data.orderId);
-        } else { alert(data.message); }
-    } catch(e) { alert("Server Error"); }
-}
-
-// ADMIN DATA (FIXED UTR REQUESTS)
-function loadAdminData() {
-    db.ref('users').on('value', snap => {
-        let h = '';
-        snap.forEach(u => {
-            h += `<div style="padding:10px; border-bottom:1px solid var(--border)">
-                ${u.val().email} (₹${u.val().balance || 0}) 
-                <button onclick="editBal('${u.key}')" style="float:right">Edit</button>
-            </div>`;
-        });
-        document.getElementById('adminUserList').innerHTML = h;
-    });
-
-    // LISTENING TO GLOBAL REQUESTS PATH
-    db.ref('paymentRequests').on('value', snap => {
-        let h = '';
-        snap.forEach(p => {
-            const req = p.val();
-            if(req.status === 'pending') {
-                h += `<div class="premium-card">
-                    ${req.email} sent ₹${req.amt}<br>UTR: ${req.utr}<br>
-                    <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})">Approve</button>
-                    <button onclick="rejectPay('${p.key}')">Reject</button>
-                </div>`;
-            }
-        });
-        document.getElementById('adminPayments').innerHTML = h || 'No pending requests';
-    });
-}
-
-function approvePay(key, uid, amt) {
-    db.ref('users/' + uid + '/balance').transaction(c => (c||0) + parseFloat(amt));
-    db.ref('paymentRequests/' + key + '/status').set('approved');
-}
-function rejectPay(key) { db.ref('paymentRequests/' + key).remove(); }
-function editBal(uid) { let a = prompt("Balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
-
-// FUND SUBMISSION (FIXED PATH)
-function submitPay() {
-    const amt = document.getElementById('amtInp').value;
-    const utr = document.getElementById('utrInp').value;
-    if(!amt || !utr) return alert("Fill fields!");
-    
-    db.ref('paymentRequests').push({
-        uid: auth.currentUser.uid,
-        email: auth.currentUser.email,
-        amt: amt,
-        utr: utr,
-        status: 'pending'
-    }).then(() => {
-        alert("Submitted!");
-        document.getElementById('qrDiv').style.display='none';
-    });
-}
-
+// UI HELPERS
 function openPage(id, el){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
