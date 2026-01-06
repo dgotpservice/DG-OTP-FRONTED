@@ -37,14 +37,12 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
 }
 
-/* DG SERVICE NAME STYLE */
-.brand-name { font-weight: 800; font-size: 14px; color: var(--primary); letter-spacing: 0.5px; }
-
 .wallet-box {
     background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 50px;
     border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
 }
 
+/* SIDEBAR */
 .sidebar {
     position: fixed; top: 0; left: -240px; width: 230px; 
     height: 100%; background: #020617; border-right: 1px solid var(--border);
@@ -65,6 +63,10 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 .premium-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 15px; }
 .input-style { width: 100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
 .btn-glow { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+
+/* SUPPORT CARDS */
+.sup-card { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 10px; text-decoration: none; color: #fff; }
+.sup-icon { font-size: 24px; width: 40px; text-align: center; }
 
 /* ADMIN UI */
 .admin-user-row { border-bottom: 1px solid var(--border); padding: 12px 0; font-size: 13px; display: flex; flex-direction: column; gap: 8px; }
@@ -96,7 +98,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <input type="text" id="signupName" placeholder="Full Name" class="input-style">
             <input type="email" id="signupEmail" placeholder="Email" class="input-style">
             <input type="password" id="signupPass" placeholder="Password" class="input-style">
-            <button class="btn-glow" onclick="doSignup()">Create Account</button>
+            <button class="btn-glow" onclick="doSignup()">Register</button>
             <p onclick="toggleAuth(true)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">Back to Login</p>
         </div>
     </div>
@@ -117,9 +119,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
         <div class="menu-trigger" onclick="toggleSidebar(true)">
             <span></span><span style="width:12px; align-self: flex-start; margin-left: 2px;"></span><span></span>
         </div>
-        
-        <div class="brand-name">DG SOCIAL SERVICE</div>
-
         <div class="wallet-box" onclick="openPage('addfund')">
             <span style="color:var(--accent); font-weight:bold;">₹<span id="balText">0.00</span></span>
         </div>
@@ -148,7 +147,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     </div>
 
     <div id="support" class="page">
-        <h3>🎧 Contact Support</h3>
+        <h3>🎧 Support</h3>
         <a href="https://wa.me/917775965170" target="_blank" class="premium-card" style="display:block; text-decoration:none;">💬 WhatsApp Chat</a>
         <a href="https://t.me/dgservice_support" target="_blank" class="premium-card" style="display:block; text-decoration:none;">✈️ Telegram Support</a>
         <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="premium-card" style="display:block; text-decoration:none;">📸 Instagram</a>
@@ -162,7 +161,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <button class="btn-glow" onclick="genQR()">Generate QR</button>
             <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
                 <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
-                <input type="text" id="utrInp" placeholder="UTR/Transaction ID" class="input-style" style="margin-top:12px">
+                <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
                 <button class="btn-glow" onclick="submitUTR()">Confirm Payment</button>
             </div>
         </div>
@@ -178,6 +177,16 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 
     <div id="admin" class="page">
         <h3>🔐 Super Admin Dashboard</h3>
+        
+        <div class="premium-card">
+            <h4>💰 Rate Commission (%)</h4>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="commInput" placeholder="e.g. 10" class="input-style" style="margin-bottom:0">
+                <button class="btn-sm" style="background:var(--primary); width:120px" onclick="updateComm()">Update Rate</button>
+            </div>
+            <small style="color:#64748b; margin-top:5px; display:block;">Add extra percentage to API prices.</small>
+        </div>
+
         <div class="premium-card">
             <h4>User Management</h4>
             <div id="adminUserList"></div>
@@ -196,7 +205,6 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 </div>
 
 <script>
-// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
     authDomain: "otp-service-74871.firebaseapp.com",
@@ -208,6 +216,8 @@ const auth = firebase.auth(), db = firebase.database();
 const MY_UID = "ndjVRXUrm7byZUhfAMnIBhxUA0F3";
 const BACKEND_URL = "https://dg-otp-backend.onrender.com";
 
+let globalComm = 0; // Local commission state
+
 auth.onAuthStateChanged(user => {
     if(user){
         db.ref('users/'+user.uid+'/status').on('value', s => {
@@ -218,6 +228,13 @@ auth.onAuthStateChanged(user => {
         document.getElementById('uName').innerText = user.displayName || 'User';
         document.getElementById('uEmail').innerText = user.email;
         document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name="+user.email;
+        
+        // Load Live Commission from Firebase
+        db.ref('settings/commission').on('value', snap => {
+            globalComm = snap.val() || 0;
+            if(user.uid === MY_UID) document.getElementById('commInput').value = globalComm;
+        });
+
         if(user.uid === MY_UID) {
             document.getElementById('adminBtn').style.display='flex';
             loadAdminPanel();
@@ -228,46 +245,12 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// FIXED PLACE ORDER BUTTON LOGIC
-async function placeFinalOrder() {
-    const srv = document.getElementById('srvSelect');
-    const serviceId = srv.options[srv.selectedIndex].getAttribute('data-id');
-    const link = document.getElementById('orderLink').value;
-    const qty = document.getElementById('orderQty').value;
-    const total = parseFloat(document.getElementById('totalPrice').innerText);
-
-    if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly!");
-
-    // Balance check before order
-    const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
-    const currentBal = snap.val() || 0;
-
-    if(currentBal < total) return alert("Insufficient Balance!");
-
-    document.getElementById('orderBtn').innerText = "Processing...";
-
-    try {
-        const res = await fetch(`${BACKEND_URL}/place-order`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
-        });
-        const data = await res.json();
-
-        if(data.success) {
-            // Deduct balance from Firebase on successful SMMVault order
-            db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
-            alert("Order Placed Successfully! Order ID: " + data.orderId);
-        } else {
-            alert("Order Error: " + data.message);
-        }
-    } catch(e) {
-        alert("Backend server error!");
-    }
-    document.getElementById('orderBtn').innerText = "Place Order";
+// COMMISSION UPDATE
+function updateComm() {
+    const val = document.getElementById('commInput').value;
+    db.ref('settings/commission').set(parseFloat(val)).then(() => alert("Commission Updated!"));
 }
 
-// ... Rest of your original script functions (API, Admin, UI) ...
 async function fetchServicesFromAPI() {
     const category = document.getElementById('catSelect').value;
     const srvSelect = document.getElementById('srvSelect');
@@ -277,11 +260,15 @@ async function fetchServicesFromAPI() {
         const data = await res.json();
         srvSelect.innerHTML = '<option value="">Choose Service</option>';
         data.forEach(s => {
-            srvSelect.innerHTML += `<option value="${s.price}" data-id="${s.id}">${s.name} - ₹${s.price}</option>`;
+            // Apply Commission to API price
+            let apiPrice = parseFloat(s.price);
+            let finalPrice = apiPrice + (apiPrice * (globalComm / 100));
+            srvSelect.innerHTML += `<option value="${finalPrice}" data-id="${s.id}">${s.name} - ₹${finalPrice.toFixed(2)}</option>`;
         });
     } catch(e) { srvSelect.innerHTML = '<option>API Error</option>'; }
 }
 
+// REST OF THE FUNCTIONS REMAIN SAME AS index (4).html
 function calculateAutoPrice() {
     const p = document.getElementById('srvSelect').value || 0;
     const q = document.getElementById('orderQty').value || 0;
@@ -291,7 +278,7 @@ function calculateAutoPrice() {
 function submitUTR() {
     const amt = document.getElementById('amtInp').value;
     const utr = document.getElementById('utrInp').value;
-    if(!amt || !utr) return alert("Fill data!");
+    if(!amt || !utr) return alert("Fill fields!");
     db.ref('paymentRequests').push({
         uid: auth.currentUser.uid,
         email: auth.currentUser.email,
@@ -347,8 +334,8 @@ function approveUTR(key, uid, amt){
     db.ref('paymentRequests/'+key+'/status').set('approved');
 }
 function rejectUTR(key){ if(confirm("Reject?")) db.ref('paymentRequests/'+key).remove(); }
-function editBal(uid){ let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
-function toggleBlock(uid, s){ db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
+function editBal(uid){ if(uid === MY_UID) return; let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+function toggleBlock(uid, s){ if(uid === MY_UID) return; db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
 
 function openPage(id, el){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -365,7 +352,34 @@ function doLogout(){ auth.signOut(); }
 function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
 function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
 function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0, status: 'active'})); }
+
+async function placeFinalOrder() {
+    const srv = document.getElementById('srvSelect');
+    const serviceId = srv.options[srv.selectedIndex].getAttribute('data-id');
+    const link = document.getElementById('orderLink').value;
+    const qty = document.getElementById('orderQty').value;
+    const total = parseFloat(document.getElementById('totalPrice').innerText);
+
+    if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly!");
+    const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
+    const currentBal = snap.val() || 0;
+    if(currentBal < total) return alert("Insufficient Balance!");
+
+    document.getElementById('orderBtn').innerText = "Processing...";
+    try {
+        const res = await fetch(`${BACKEND_URL}/place-order`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
+        });
+        const data = await res.json();
+        if(data.success) {
+            db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
+            alert("Order Placed Successfully! Order ID: " + data.orderId);
+        } else { alert("Order Error: " + data.message); }
+    } catch(e) { alert("Backend server error!"); }
+    document.getElementById('orderBtn').innerText = "Place Order";
+}
 </script>
 </body>
-    </html>
-    
+</html>
