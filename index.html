@@ -276,7 +276,6 @@ async function placeFinalOrder() {
 
     if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly");
 
-    // Check Balance via Firebase
     const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
     const currentBal = snap.val() || 0;
 
@@ -304,24 +303,29 @@ async function placeFinalOrder() {
 
 // ADMIN FUNCTIONS (MANUAL DATA CONTROL)
 function loadAdminData() {
+    // Users List
     db.ref('users').on('value', snap => {
         let h = '';
         snap.forEach(u => {
             h += `<div class="admin-row">
-                <b>${u.val().email}</b> (₹${u.val().balance || 0}) 
+                <b>${u.val().email || 'User'}</b> (₹${u.val().balance || 0}) 
                 <button onclick="editBal('${u.key}')" style="background:var(--primary); border:none; color:white; border-radius:5px; padding:3px 8px; float:right">Edit</button>
             </div>`;
         });
         document.getElementById('adminUserList').innerHTML = h;
     });
 
+    // Payment Requests Fixed
     db.ref('paymentRequests').on('value', snap => {
         let h = '';
         snap.forEach(p => {
-            if(p.val().status === 'pending') {
+            const req = p.val();
+            if(req.status === 'pending') {
                 h += `<div class="premium-card" style="font-size:13px">
-                    ${p.val().email} - ₹${p.val().amt} (UTR: ${p.val().utr})<br>
-                    <button onclick="approvePay('${p.key}', '${p.val().uid}', ${p.val().amt})" style="background:var(--accent); color:white; border:none; padding:5px; border-radius:5px; margin-top:5px">Approve</button>
+                    <b>Email:</b> ${req.email || 'N/A'}<br>
+                    <b>Amount:</b> ₹${req.amt}<br>
+                    <b>UTR:</b> ${req.utr}<br>
+                    <button onclick="approvePay('${p.key}', '${req.uid}', ${req.amt})" style="background:var(--accent); color:white; border:none; padding:5px; border-radius:5px; margin-top:5px">Approve</button>
                     <button onclick="rejectPay('${p.key}')" style="background:red; color:white; border:none; padding:5px; border-radius:5px; margin-top:5px">Reject</button>
                 </div>`;
             }
@@ -331,11 +335,13 @@ function loadAdminData() {
 }
 
 function editBal(uid) { let a = prompt("Set new balance:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+
 function approvePay(key, uid, amt) {
     db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
     db.ref('paymentRequests/'+key+'/status').set('approved');
 }
-function rejectPay(key) { if(confirm("Reject?")) db.ref('paymentRequests/'+key).remove(); }
+
+function rejectPay(key) { if(confirm("Reject this request?")) db.ref('paymentRequests/'+key).remove(); }
 
 // UI NAVIGATION
 function openPage(id, el){
@@ -344,16 +350,39 @@ function openPage(id, el){
     toggleSidebar(false);
 }
 function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
-function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+
+function doGoogleAuth() { 
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider); 
+}
+
 function genQR(){
     const a = document.getElementById('amtInp').value;
+    if(!a || a <= 0) return alert("Enter amount first");
     document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${a}%26cu=INR`;
     document.getElementById('qrDiv').style.display='block';
 }
+
 function submitPay(){
-    db.ref('paymentRequests').push({ uid: auth.currentUser.uid, email: auth.currentUser.email, amt: document.getElementById('amtInp').value, utr: document.getElementById('utrInp').value, status: 'pending' });
-    alert("UTR Submitted!");
+    const amt = document.getElementById('amtInp').value;
+    const utr = document.getElementById('utrInp').value;
+    
+    if(!amt || !utr) return alert("Please fill amount and UTR number");
+
+    db.ref('paymentRequests').push({ 
+        uid: auth.currentUser.uid, 
+        email: auth.currentUser.email, 
+        amt: parseFloat(amt), 
+        utr: utr, 
+        status: 'pending' 
+    }).then(() => {
+        alert("UTR Submitted! Wait for Admin Approval.");
+        document.getElementById('qrDiv').style.display = 'none';
+        document.getElementById('amtInp').value = '';
+        document.getElementById('utrInp').value = '';
+    });
 }
+
 function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
 function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
 function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> {
