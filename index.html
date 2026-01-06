@@ -37,12 +37,14 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
 }
 
+/* DG SERVICE NAME STYLE */
+.brand-name { font-weight: 800; font-size: 14px; color: var(--primary); letter-spacing: 0.5px; }
+
 .wallet-box {
     background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 50px;
     border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
 }
 
-/* SIDEBAR */
 .sidebar {
     position: fixed; top: 0; left: -240px; width: 230px; 
     height: 100%; background: #020617; border-right: 1px solid var(--border);
@@ -64,11 +66,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 .input-style { width: 100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
 .btn-glow { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
 
-/* SUPPORT CARDS */
-.sup-card { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 10px; text-decoration: none; color: #fff; }
-.sup-icon { font-size: 24px; width: 40px; text-align: center; }
-
-/* ADMIN USER LIST */
+/* ADMIN UI */
 .admin-user-row { border-bottom: 1px solid var(--border); padding: 12px 0; font-size: 13px; display: flex; flex-direction: column; gap: 8px; }
 .admin-actions { display: flex; gap: 8px; }
 .btn-sm { padding: 6px 12px; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; color: #fff; font-weight: bold; }
@@ -98,7 +96,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <input type="text" id="signupName" placeholder="Full Name" class="input-style">
             <input type="email" id="signupEmail" placeholder="Email" class="input-style">
             <input type="password" id="signupPass" placeholder="Password" class="input-style">
-            <button class="btn-glow" onclick="doSignup()">Register Account</button>
+            <button class="btn-glow" onclick="doSignup()">Create Account</button>
             <p onclick="toggleAuth(true)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">Back to Login</p>
         </div>
     </div>
@@ -119,6 +117,9 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
         <div class="menu-trigger" onclick="toggleSidebar(true)">
             <span></span><span style="width:12px; align-self: flex-start; margin-left: 2px;"></span><span></span>
         </div>
+        
+        <div class="brand-name">DG SOCIAL SERVICE</div>
+
         <div class="wallet-box" onclick="openPage('addfund')">
             <span style="color:var(--accent); font-weight:bold;">₹<span id="balText">0.00</span></span>
         </div>
@@ -147,7 +148,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     </div>
 
     <div id="support" class="page">
-        <h3>🎧 Support</h3>
+        <h3>🎧 Contact Support</h3>
         <a href="https://wa.me/917775965170" target="_blank" class="premium-card" style="display:block; text-decoration:none;">💬 WhatsApp Chat</a>
         <a href="https://t.me/dgservice_support" target="_blank" class="premium-card" style="display:block; text-decoration:none;">✈️ Telegram Support</a>
         <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="premium-card" style="display:block; text-decoration:none;">📸 Instagram</a>
@@ -161,7 +162,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
             <button class="btn-glow" onclick="genQR()">Generate QR</button>
             <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
                 <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
-                <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
+                <input type="text" id="utrInp" placeholder="UTR/Transaction ID" class="input-style" style="margin-top:12px">
                 <button class="btn-glow" onclick="submitUTR()">Confirm Payment</button>
             </div>
         </div>
@@ -176,7 +177,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
     </div>
 
     <div id="admin" class="page">
-        <h3>🔐 Admin Dashboard</h3>
+        <h3>🔐 Super Admin Dashboard</h3>
         <div class="premium-card">
             <h4>User Management</h4>
             <div id="adminUserList"></div>
@@ -195,7 +196,7 @@ body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflo
 </div>
 
 <script>
-// Firebase Setup
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
     authDomain: "otp-service-74871.firebaseapp.com",
@@ -204,7 +205,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.database();
 
-// RESTRICTED ADMIN UID UPDATED
 const MY_UID = "ndjVRXUrm7byZUhfAMnIBhxUA0F3";
 const BACKEND_URL = "https://dg-otp-backend.onrender.com";
 
@@ -213,114 +213,61 @@ auth.onAuthStateChanged(user => {
         db.ref('users/'+user.uid+'/status').on('value', s => {
             if(s.val() === 'blocked'){ alert("Blocked!"); auth.signOut(); }
         });
-
         document.getElementById('authBox').style.display='none';
         document.getElementById('app').style.display='block';
-        document.getElementById('uName').innerText = user.displayName || 'Guest';
+        document.getElementById('uName').innerText = user.displayName || 'User';
         document.getElementById('uEmail').innerText = user.email;
         document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name="+user.email;
-        
-        // Restricted to new UID
         if(user.uid === MY_UID) {
             document.getElementById('adminBtn').style.display='flex';
             loadAdminPanel();
-        } else {
-            document.getElementById('adminBtn').style.display='none';
         }
-
         db.ref('users/' + user.uid + '/balance').on('value', s => document.getElementById('balText').innerText = (s.val() || 0).toFixed(2));
     } else {
         document.getElementById('authBox').style.display='flex'; document.getElementById('app').style.display='none';
     }
 });
 
-// UTR SUBMISSION (FIXED FOR ADMIN RECEIPT)
-function submitUTR() {
-    const amt = document.getElementById('amtInp').value;
-    const utr = document.getElementById('utrInp').value;
-    if(!amt || !utr) return alert("Fill fields!");
-    
-    db.ref('paymentRequests').push({
-        uid: auth.currentUser.uid,
-        email: auth.currentUser.email,
-        amt: parseFloat(amt),
-        utr: utr,
-        status: 'pending',
-        timestamp: Date.now()
-    }).then(() => {
-        alert("UTR Sent to Admin!");
-        document.getElementById('qrDiv').style.display='none';
-        document.getElementById('amtInp').value = '';
-        document.getElementById('utrInp').value = '';
-    });
-}
+// FIXED PLACE ORDER BUTTON LOGIC
+async function placeFinalOrder() {
+    const srv = document.getElementById('srvSelect');
+    const serviceId = srv.options[srv.selectedIndex].getAttribute('data-id');
+    const link = document.getElementById('orderLink').value;
+    const qty = document.getElementById('orderQty').value;
+    const total = parseFloat(document.getElementById('totalPrice').innerText);
 
-// ADMIN PANEL REALTIME LISTENER
-function loadAdminPanel() {
-    // Users Sync
-    db.ref('users').on('value', snap => {
-        let h = '';
-        snap.forEach(u => {
-            const d = u.val();
-            const isSelf = u.key === MY_UID; // Admin account protection
-            h += `<div class="admin-user-row">
-                <b>${d.email || 'User'}</b>
-                <span>Bal: ₹${(d.balance || 0).toFixed(2)} | Status: ${d.status || 'Active'}</span>
-                <div class="admin-actions">
-                    ${isSelf ? '<span style="color:#64748b; font-size:11px;">(Master Admin Account Protected)</span>' : `
-                    <button class="btn-sm" style="background:var(--primary)" onclick="editBal('${u.key}')">Edit Bal</button>
-                    <button class="btn-sm" style="background:#f59e0b" onclick="toggleBlock('${u.key}','${d.status}')">${d.status === 'blocked' ? 'Unblock' : 'Block'}</button>
-                    `}
-                </div>
-            </div>`;
+    if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly!");
+
+    // Balance check before order
+    const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
+    const currentBal = snap.val() || 0;
+
+    if(currentBal < total) return alert("Insufficient Balance!");
+
+    document.getElementById('orderBtn').innerText = "Processing...";
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/place-order`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
         });
-        document.getElementById('adminUserList').innerHTML = h || 'No users found.';
-    });
+        const data = await res.json();
 
-    // UTR Sync
-    db.ref('paymentRequests').on('value', snap => {
-        let h = '';
-        snap.forEach(p => {
-            const req = p.val();
-            if(req.status === 'pending'){
-                h += `<div class="premium-card" style="font-size:12px">
-                    <b>${req.email}</b> | ₹${req.amt}<br>UTR: ${req.utr}
-                    <div class="admin-actions">
-                        <button class="btn-sm" style="background:var(--accent)" onclick="approveUTR('${p.key}','${req.uid}',${req.amt})">Approve</button>
-                        <button class="btn-sm" style="background:red" onclick="rejectUTR('${p.key}')">Reject</button>
-                    </div>
-                </div>`;
-            }
-        });
-        document.getElementById('adminPayments').innerHTML = h || 'No pending requests.';
-    });
+        if(data.success) {
+            // Deduct balance from Firebase on successful SMMVault order
+            db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
+            alert("Order Placed Successfully! Order ID: " + data.orderId);
+        } else {
+            alert("Order Error: " + data.message);
+        }
+    } catch(e) {
+        alert("Backend server error!");
+    }
+    document.getElementById('orderBtn').innerText = "Place Order";
 }
 
-function approveUTR(key, uid, amt){
-    db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
-    db.ref('paymentRequests/'+key+'/status').set('approved');
-}
-function rejectUTR(key){ if(confirm("Reject?")) db.ref('paymentRequests/'+key).remove(); }
-function editBal(uid){ if(uid === MY_UID) return; let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
-function toggleBlock(uid, s){ if(uid === MY_UID) return; db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
-
-// UI NAVIGATION
-function openPage(id, el){
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    toggleSidebar(false);
-}
-function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
-function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-function genQR(){
-    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${document.getElementById('amtInp').value}%26cu=INR`;
-    document.getElementById('qrDiv').style.display='block';
-}
-function doLogout(){ auth.signOut(); }
-function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
-function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
-function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0, status: 'active'})); }
-
+// ... Rest of your original script functions (API, Admin, UI) ...
 async function fetchServicesFromAPI() {
     const category = document.getElementById('catSelect').value;
     const srvSelect = document.getElementById('srvSelect');
@@ -340,6 +287,85 @@ function calculateAutoPrice() {
     const q = document.getElementById('orderQty').value || 0;
     document.getElementById('totalPrice').innerText = (p * (q/1000)).toFixed(2);
 }
+
+function submitUTR() {
+    const amt = document.getElementById('amtInp').value;
+    const utr = document.getElementById('utrInp').value;
+    if(!amt || !utr) return alert("Fill data!");
+    db.ref('paymentRequests').push({
+        uid: auth.currentUser.uid,
+        email: auth.currentUser.email,
+        amt: parseFloat(amt),
+        utr: utr,
+        status: 'pending',
+        timestamp: Date.now()
+    }).then(() => {
+        alert("UTR Sent to Admin!");
+        document.getElementById('qrDiv').style.display='none';
+    });
+}
+
+function loadAdminPanel() {
+    db.ref('users').on('value', snap => {
+        let h = '';
+        snap.forEach(u => {
+            const d = u.val();
+            const isSelf = u.key === MY_UID;
+            h += `<div class="admin-user-row">
+                <b>${d.email || 'User'}</b>
+                <span>Bal: ₹${(d.balance || 0).toFixed(2)} | Status: ${d.status || 'Active'}</span>
+                <div class="admin-actions">
+                    ${isSelf ? '<span style="font-size:11px;">(Master Admin)</span>' : `
+                    <button class="btn-sm" style="background:var(--primary)" onclick="editBal('${u.key}')">Edit</button>
+                    <button class="btn-sm" style="background:#f59e0b" onclick="toggleBlock('${u.key}','${d.status}')">Status</button>
+                    `}
+                </div>
+            </div>`;
+        });
+        document.getElementById('adminUserList').innerHTML = h;
+    });
+
+    db.ref('paymentRequests').on('value', snap => {
+        let h = '';
+        snap.forEach(p => {
+            if(p.val().status === 'pending'){
+                h += `<div class="premium-card" style="font-size:12px">
+                    <b>${p.val().email}</b> | ₹${p.val().amt}<br>UTR: ${p.val().utr}
+                    <div class="admin-actions">
+                        <button class="btn-sm" style="background:var(--accent)" onclick="approveUTR('${p.key}','${p.val().uid}',${p.val().amt})">Approve</button>
+                        <button class="btn-sm" style="background:red" onclick="rejectUTR('${p.key}')">Reject</button>
+                    </div>
+                </div>`;
+            }
+        });
+        document.getElementById('adminPayments').innerHTML = h || 'No pending requests.';
+    });
+}
+
+function approveUTR(key, uid, amt){
+    db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
+    db.ref('paymentRequests/'+key+'/status').set('approved');
+}
+function rejectUTR(key){ if(confirm("Reject?")) db.ref('paymentRequests/'+key).remove(); }
+function editBal(uid){ let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
+function toggleBlock(uid, s){ db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
+
+function openPage(id, el){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    toggleSidebar(false);
+}
+function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
+function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+function genQR(){
+    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${document.getElementById('amtInp').value}%26cu=INR`;
+    document.getElementById('qrDiv').style.display='block';
+}
+function doLogout(){ auth.signOut(); }
+function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
+function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
+function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0, status: 'active'})); }
 </script>
 </body>
-</html>
+    </html>
+    
