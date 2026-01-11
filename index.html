@@ -896,101 +896,10 @@
             word-break: break-all;
             margin: 15px 0;
         }
-
-        /* Payment Verification Styles */
-        .payment-verify-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .verify-btn {
-            background: linear-gradient(135deg, #10b981, #0da271);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 10px;
-        }
-
-        .verify-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .verify-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .payment-status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .status-verifying {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning);
-        }
-
-        .status-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent);
-        }
-
-        .status-failed {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-        
-        /* Security Warning */
-        .security-warning {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-        }
-        
-        .security-alert {
-            color: var(--danger);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        /* Hidden security elements */
-        .security-check {
-            display: none;
-        }
     </style>
 </head>
 <body>
     <div class="glow-effect"></div>
-
-    <!-- Security Warning (Shown only if tampering detected) -->
-    <div id="securityWarning" class="security-warning">
-        <div class="security-alert">
-            <i class="fas fa-shield-alt"></i> SECURITY ALERT: Tampering detected!
-        </div>
-        <p style="color: var(--text-light); font-size: 14px;">
-            Unauthorized modifications detected. Please reload the page.
-        </p>
-    </div>
-
-    <!-- Hidden Security Checks -->
-    <div class="security-check" id="integrityCheck" data-hash=""></div>
-    <div class="security-check" id="timestampCheck" data-time=""></div>
 
     <!-- Authentication Screen -->
     <div id="authBox">
@@ -1356,33 +1265,31 @@
                             <span style="font-weight: 600;">UPI ID:</span>
                         </div>
                         <div style="font-size: 22px; font-weight: 700; color: var(--primary);">aqdaskhan03@fam</div>
-                        <p style="color: var(--text-light); margin-top: 10px; font-size: 14px;">Send payment to this UPI ID and verify payment below</p>
+                        <p style="color: var(--text-light); margin-top: 10px; font-size: 14px;">Send payment to this UPI ID and enter UTR below</p>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Amount (₹)</label>
-                        <input type="number" id="amtInp" placeholder="Enter amount to add" class="input-field" min="10" max="100000">
+                        <input type="number" id="amtInp" placeholder="Enter amount to add" class="input-field">
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">UTR / Transaction ID</label>
-                        <input type="text" id="utrInp" placeholder="Enter UTR from your payment" class="input-field">
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="verifyPayment()">
-                        <i class="fas fa-check-circle"></i> Verify & Submit Payment
+                    <button class="btn btn-primary" onclick="genQR()">
+                        <i class="fas fa-qrcode"></i> Generate Payment QR
                     </button>
                     
-                    <div id="paymentStatusDiv" style="display: none; margin-top: 20px;">
-                        <div class="payment-verify-box">
-                            <h3 style="color: var(--primary); margin-bottom: 15px;">Payment Verification</h3>
-                            <div id="paymentStatus" class="payment-status">
-                                <!-- Verification status will appear here -->
-                            </div>
-                            <button id="verifyBtn" class="verify-btn" onclick="verifyPayment()">
-                                <i class="fas fa-sync-alt"></i> Verify Payment
-                            </button>
+                    <div id="qrDiv" style="display: none; text-align: center; margin-top: 25px;">
+                        <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+                            <img id="qrImg" src="" style="width: 200px; height: 200px;">
                         </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">UTR / Transaction ID</label>
+                            <input type="text" id="utrInp" placeholder="Enter UTR from your payment" class="input-field">
+                        </div>
+                        
+                        <button class="btn btn-success-sm" style="width: 100%; padding: 15px; font-size: 16px;" onclick="submitUTR()">
+                            <i class="fas fa-check-circle"></i> Confirm Payment
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1642,7 +1549,7 @@
                             <div class="commission-input-box">
                                 <input type="number" id="commInput" placeholder="Enter commission percentage (e.g., 15.5 for 15.5%)" class="commission-input" min="0" max="100" step="0.5">
                             </div>
-                            <button class="btn btn-primary-sm" onclick="updateCommission()" style="padding: 16px 30px; font-size: 16px;">
+                            <button class="btn btn-primary-sm" onclick="updateComm()" style="padding: 16px 30px; font-size: 16px;">
                                 Update Commission
                             </button>
                         </div>
@@ -1714,82 +1621,7 @@
     </div>
 
     <script>
-        // === SECURITY CONFIGURATION ===
-        const SECURITY_CONFIG = {
-            // Master Admin UID (Change this to your Firebase Auth UID)
-            MASTER_ADMIN_UID: "ndjVRXUrm7byZUhfAMnIBhxUA0F3",
-            
-            // Security keys (Change these to random strings)
-            INTEGRITY_KEY: "DG_SECURE_2024_" + Math.random().toString(36).substring(2, 15),
-            TIMESTAMP_KEY: Date.now().toString(36),
-            
-            // Backend API URL
-            BACKEND_URL: "https://dg-otp-backend.onrender.com",
-            
-            // Security settings
-            ENABLE_ANTI_TAMPER: true,
-            ENABLE_CLIENT_VALIDATION: true,
-            ENABLE_RATE_LIMITING: true,
-            
-            // Payment settings
-            AUTO_APPROVE_THRESHOLD: 500,
-            VERIFICATION_DELAY: 5000
-        };
-
-        // === INITIAL SECURITY CHECK ===
-        (function() {
-            // Check if code has been tampered
-            const originalHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-            const currentHash = Array.from(document.documentElement.outerHTML)
-                .reduce((hash, char) => {
-                    const code = char.charCodeAt(0);
-                    return ((hash << 5) - hash) + code;
-                }, 0).toString(16);
-            
-            // Set integrity check
-            document.getElementById('integrityCheck').dataset.hash = currentHash;
-            document.getElementById('timestampCheck').dataset.time = Date.now();
-            
-            // Detect DevTools
-            const devtools = /./;
-            devtools.toString = function() {
-                document.getElementById('securityWarning').style.display = 'block';
-                return 'devtools';
-            };
-            
-            console.log('%cSECURITY ALERT', 'color: red; font-size: 50px; font-weight: bold;');
-            console.log('%cUnauthorized access is prohibited!', 'color: yellow; font-size: 20px;');
-            console.log(devtools);
-            
-            // Prevent copy-paste of sensitive data
-            document.addEventListener('copy', function(e) {
-                const selection = window.getSelection();
-                if (selection.toString().includes('DG_SECURE') || 
-                    selection.toString().includes('Firebase') ||
-                    selection.toString().includes('admin')) {
-                    e.preventDefault();
-                    alert('Copying sensitive information is not allowed!');
-                }
-            });
-            
-            // Prevent context menu
-            document.addEventListener('contextmenu', function(e) {
-                if (e.target.closest('.api-key-box') || 
-                    e.target.closest('.referral-code') ||
-                    e.target.closest('#admin')) {
-                    e.preventDefault();
-                    alert('Right-click disabled for security!');
-                }
-            });
-            
-            // Detect if running in iframe (phishing protection)
-            if (window.self !== window.top) {
-                document.body.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">SECURITY ALERT: Phishing attempt detected!</h1>';
-                throw new Error('Security violation: Running in iframe');
-            }
-        })();
-
-        // === FIREBASE CONFIGURATION ===
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
             authDomain: "otp-service-74871.firebaseapp.com",
@@ -1801,677 +1633,96 @@
         const auth = firebase.auth();
         const db = firebase.database();
         
-        // === GLOBAL VARIABLES ===
+        // Constants
+        const MY_UID = "ndjVRXUrm7byZUhfAMnIBhxUA0F3";
+        const BACKEND_URL = "https://dg-otp-backend.onrender.com";
         let globalComm = 0;
-        let userBalance = 0;
-        let securityToken = null;
         
-        // === SECURITY FUNCTIONS ===
-        function generateSecurityToken(userId) {
-            const timestamp = Date.now();
-            const random = Math.random().toString(36).substring(2, 15);
-            const token = btoa(`${userId}:${timestamp}:${random}:${SECURITY_CONFIG.INTEGRITY_KEY}`);
-            securityToken = token;
-            return token;
-        }
-        
-        function validateSecurityToken(token) {
-            if (!token) return false;
-            try {
-                const decoded = atob(token);
-                const parts = decoded.split(':');
-                if (parts.length !== 4) return false;
-                if (parts[3] !== SECURITY_CONFIG.INTEGRITY_KEY) return false;
-                
-                const timestamp = parseInt(parts[1]);
-                const now = Date.now();
-                // Token valid for 1 hour
-                if (now - timestamp > 3600000) return false;
-                
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-        
-        async function secureFetch(url, options = {}) {
-            // Add security headers
-            const defaultHeaders = {
-                'X-Security-Token': securityToken,
-                'X-User-ID': auth.currentUser?.uid || '',
-                'X-Timestamp': Date.now().toString(),
-                'X-Integrity-Check': SECURITY_CONFIG.INTEGRITY_KEY.substring(0, 16)
-            };
-            
-            options.headers = { ...defaultHeaders, ...options.headers };
-            
-            // Add timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            options.signal = controller.signal;
-            
-            try {
-                const response = await fetch(url, options);
-                clearTimeout(timeoutId);
-                
-                // Check response headers for security
-                const securityHeader = response.headers.get('X-Security-Status');
-                if (securityHeader === 'blocked') {
-                    throw new Error('Security violation detected');
-                }
-                
-                return response;
-            } catch (error) {
-                clearTimeout(timeoutId);
-                throw error;
-            }
-        }
-        
-        // === AUTHENTICATION SECURITY ===
+        // Auth State Listener
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Generate security token
-                generateSecurityToken(user.uid);
-                
-                // Enhanced security checks
-                const securityChecks = [
-                    checkUserStatus(user.uid),
-                    validateUserSession(user.uid),
-                    checkConcurrentSessions(user.uid)
-                ];
-                
-                Promise.all(securityChecks).then(results => {
-                    if (results.every(r => r === true)) {
-                        loadUserData(user);
-                    } else {
+                // Check if user is blocked
+                db.ref('users/' + user.uid + '/status').on('value', snap => {
+                    if (snap.val() === 'blocked') {
+                        alert("Your account has been blocked!");
                         auth.signOut();
-                        alert('Security violation detected! Session terminated.');
+                        return;
                     }
-                }).catch(() => {
-                    auth.signOut();
+                    document.getElementById('userStatus').innerText = snap.val() || 'Active';
                 });
+                
+                // Show app, hide auth
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                // Update user profile
+                const displayName = user.displayName || 'User';
+                const email = user.email || 'user@email.com';
+                const photoURL = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName) + "&background=6366f1&color=fff";
+                
+                document.getElementById('uName').innerText = displayName;
+                document.getElementById('uEmail').innerText = email;
+                document.getElementById('uPfp').src = photoURL;
+                
+                // Update sidebar profile
+                document.getElementById('sidebarName').innerText = displayName;
+                document.getElementById('sidebarEmail').innerText = email;
+                document.getElementById('sidebarPfp').src = photoURL;
+                
+                // Load commission
+                db.ref('settings/commission').on('value', snap => {
+                    globalComm = snap.val() || 0;
+                    if (user.uid === MY_UID) {
+                        document.getElementById('commInput').value = globalComm;
+                        document.getElementById('currentCommission').innerText = globalComm + "%";
+                    }
+                });
+                
+                // Show admin button for admin
+                if (user.uid === MY_UID) {
+                    document.getElementById('adminBtn').style.display = 'flex';
+                    loadAdminPanel();
+                }
+                
+                // Load balance
+                db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                    const balance = (snap.val() || 0).toFixed(2);
+                    document.getElementById('balText').innerText = balance;
+                    document.getElementById('profileBal').innerText = balance;
+                });
+                
+                // Load user data for other pages
+                loadOrders();
+                loadRefillHistory();
+                loadAllServices();
+                loadTickets();
+                loadAPIKey();
+                loadReferralData();
+                
             } else {
+                // Show auth, hide app
                 document.getElementById('authBox').style.display = 'flex';
                 document.getElementById('app').style.display = 'none';
-                securityToken = null;
             }
         });
         
-        async function checkUserStatus(uid) {
-            const snap = await db.ref('users/' + uid + '/status').once('value');
-            return snap.val() !== 'blocked';
-        }
-        
-        async function validateUserSession(uid) {
-            const sessionId = 'SESSION_' + Date.now();
-            await db.ref('sessions/' + uid).set({
-                id: sessionId,
-                timestamp: Date.now(),
-                userAgent: navigator.userAgent
-            });
-            return true;
-        }
-        
-        async function checkConcurrentSessions(uid) {
-            const snap = await db.ref('sessions/' + uid).once('value');
-            const session = snap.val();
-            if (!session) return true;
-            
-            // Allow only one session per user
-            const now = Date.now();
-            if (now - session.timestamp > 300000) { // 5 minutes
-                return true;
-            }
-            return session.userAgent === navigator.userAgent;
-        }
-        
-        // === LOAD USER DATA (SECURE) ===
-        function loadUserData(user) {
-            // Show app
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Update profile securely
-            const displayName = user.displayName || 'User';
-            const email = user.email || 'user@email.com';
-            const photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
-            
-            // Update UI
-            document.getElementById('uName').textContent = displayName;
-            document.getElementById('uEmail').textContent = email;
-            document.getElementById('uPfp').src = photoURL;
-            document.getElementById('sidebarName').textContent = displayName;
-            document.getElementById('sidebarEmail').textContent = email;
-            document.getElementById('sidebarPfp').src = photoURL;
-            
-            // Load commission (admin only)
-            if (user.uid === SECURITY_CONFIG.MASTER_ADMIN_UID) {
-                document.getElementById('adminBtn').style.display = 'flex';
-                loadCommission();
-                loadAdminPanel();
-            }
-            
-            // Load balance (secure read-only)
-            loadUserBalance(user.uid);
-            
-            // Load other data
-            loadOrders(user.uid);
-            loadRefillHistory(user.uid);
-            loadAllServices();
-            loadTickets(user.uid);
-            loadAPIKey(user.uid);
-            loadReferralData(user.uid);
-        }
-        
-        // === SECURE BALANCE MANAGEMENT ===
-        async function loadUserBalance(uid) {
-            try {
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/get-balance`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        uid: uid,
-                        token: securityToken
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success && data.balance !== undefined) {
-                    userBalance = data.balance;
-                    document.getElementById('balText').textContent = data.balance.toFixed(2);
-                    document.getElementById('profileBal').textContent = data.balance.toFixed(2);
-                }
-            } catch (error) {
-                console.error('Error loading balance:', error);
-                // Fallback to Firebase (read-only)
-                db.ref('users/' + uid + '/balance').on('value', snap => {
-                    const balance = (snap.val() || 0).toFixed(2);
-                    document.getElementById('balText').textContent = balance;
-                    document.getElementById('profileBal').textContent = balance;
-                });
-            }
-        }
-        
-        // === SECURE COMMISSION MANAGEMENT ===
-        async function loadCommission() {
-            try {
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/get-commission`);
-                const data = await response.json();
-                if (data.success && data.commission !== undefined) {
-                    globalComm = data.commission;
-                    document.getElementById('commInput').value = globalComm;
-                    document.getElementById('currentCommission').textContent = globalComm + "%";
-                }
-            } catch (error) {
-                console.error('Error loading commission:', error);
-                // Fallback
-                db.ref('settings/commission').on('value', snap => {
-                    globalComm = snap.val() || 0;
-                    document.getElementById('commInput').value = globalComm;
-                    document.getElementById('currentCommission').textContent = globalComm + "%";
-                });
-            }
-        }
-        
-        async function updateCommission() {
+        // Commission Update
+        function updateComm() {
             const val = parseFloat(document.getElementById('commInput').value);
             if (isNaN(val) || val < 0 || val > 100) {
                 alert("Please enter a valid commission percentage (0-100)");
                 return;
             }
             
-            try {
-                const user = auth.currentUser;
-                if (!user || user.uid !== SECURITY_CONFIG.MASTER_ADMIN_UID) {
-                    alert("Unauthorized!");
-                    return;
-                }
-                
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/update-commission`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        commission: val,
-                        token: securityToken,
-                        uid: user.uid
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    alert("Commission updated successfully!");
-                    globalComm = val;
-                    document.getElementById('currentCommission').textContent = val + "%";
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
+            db.ref('settings/commission').set(val).then(() => {
+                alert("Commission updated successfully to " + val + "%!");
+                document.getElementById('currentCommission').innerText = val + "%";
+            }).catch(error => {
                 alert("Error updating commission: " + error.message);
-            }
+            });
         }
         
-        // === SECURE PAYMENT VERIFICATION ===
-        async function verifyPayment() {
-            const amt = document.getElementById('amtInp').value;
-            const utr = document.getElementById('utrInp').value.trim();
-            
-            if (!amt || amt <= 0) {
-                alert("Please enter a valid amount!");
-                return;
-            }
-            
-            if (!utr || utr.length < 8) {
-                alert("Please enter a valid UTR/Transaction ID (minimum 8 characters)!");
-                return;
-            }
-            
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            // Show verification status
-            document.getElementById('paymentStatusDiv').style.display = 'block';
-            const statusDiv = document.getElementById('paymentStatus');
-            const verifyBtn = document.getElementById('verifyBtn');
-            
-            statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying payment...';
-            statusDiv.className = 'payment-status status-verifying';
-            verifyBtn.disabled = true;
-            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-            
-            try {
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/verify-payment`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        amount: parseFloat(amt),
-                        utr: utr,
-                        uid: user.uid,
-                        email: user.email,
-                        name: user.displayName || 'User',
-                        token: securityToken
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Payment verified successfully!';
-                    statusDiv.className = 'payment-status status-success';
-                    
-                    if (data.autoApproved) {
-                        statusDiv.innerHTML += '<br><i class="fas fa-bolt"></i> Payment auto-approved!';
-                        // Update local balance
-                        userBalance += parseFloat(amt);
-                        document.getElementById('balText').textContent = userBalance.toFixed(2);
-                        document.getElementById('profileBal').textContent = userBalance.toFixed(2);
-                        
-                        alert(`Payment of ₹${amt} verified and approved!\nYour balance has been updated.`);
-                    } else {
-                        statusDiv.innerHTML += '<br><i class="fas fa-clock"></i> Awaiting admin approval...';
-                        alert(`Payment of ₹${amt} verified successfully!\nYour payment is awaiting admin approval.`);
-                    }
-                    
-                    // Reset form
-                    document.getElementById('amtInp').value = '';
-                    document.getElementById('utrInp').value = '';
-                    document.getElementById('paymentStatusDiv').style.display = 'none';
-                    verifyBtn.disabled = false;
-                    verifyBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Verify Payment';
-                } else {
-                    statusDiv.innerHTML = `<i class="fas fa-times-circle"></i> ${data.message || 'Payment verification failed'}`;
-                    statusDiv.className = 'payment-status status-failed';
-                    verifyBtn.innerHTML = '<i class="fas fa-redo"></i> Try Again';
-                    verifyBtn.disabled = false;
-                }
-            } catch (error) {
-                statusDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Verification error: ${error.message}`;
-                statusDiv.className = 'payment-status status-failed';
-                verifyBtn.innerHTML = '<i class="fas fa-redo"></i> Try Again';
-                verifyBtn.disabled = false;
-            }
-        }
-        
-        // === SECURE ORDER PLACEMENT ===
-        async function placeFinalOrder() {
-            const srvSelect = document.getElementById('srvSelect');
-            const serviceId = srvSelect.options[srvSelect.selectedIndex]?.getAttribute('data-id');
-            const link = document.getElementById('orderLink').value;
-            const qty = document.getElementById('orderQty').value;
-            const total = parseFloat(document.getElementById('totalPrice').innerText);
-            
-            // Validation
-            if (!serviceId) {
-                alert("Please select a service!");
-                return;
-            }
-            
-            if (!link || link.trim().length < 3) {
-                alert("Please enter a valid link or username!");
-                return;
-            }
-            
-            if (!qty || qty < 10) {
-                alert("Quantity must be at least 10!");
-                return;
-            }
-            
-            if (total <= 0) {
-                alert("Total price must be greater than 0!");
-                return;
-            }
-            
-            // Check balance
-            if (userBalance < total) {
-                alert(`Insufficient balance! You need ₹${total.toFixed(2)} but have only ₹${userBalance.toFixed(2)}`);
-                return;
-            }
-            
-            // Confirm order
-            if (!confirm(`Confirm order for ₹${total.toFixed(2)}?`)) return;
-            
-            const orderBtn = document.getElementById('orderBtn');
-            const originalText = orderBtn.innerHTML;
-            orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            orderBtn.disabled = true;
-            
-            try {
-                const user = auth.currentUser;
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/place-order`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        service: serviceId,
-                        link: link.trim(),
-                        quantity: qty,
-                        amount: total,
-                        uid: user.uid,
-                        token: securityToken
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Update local balance
-                    userBalance -= total;
-                    document.getElementById('balText').textContent = userBalance.toFixed(2);
-                    document.getElementById('profileBal').textContent = userBalance.toFixed(2);
-                    
-                    // Save order locally
-                    const orderId = 'ORDER' + Date.now();
-                    await db.ref('orders/' + user.uid + '/' + orderId).set({
-                        service: serviceId,
-                        link: link,
-                        quantity: qty,
-                        amount: total,
-                        status: 'pending',
-                        timestamp: Date.now(),
-                        orderId: data.orderId || orderId
-                    });
-                    
-                    alert(`Order placed successfully!\nOrder ID: ${data.orderId || orderId}\nAmount: ₹${total.toFixed(2)}\nRemaining Balance: ₹${userBalance.toFixed(2)}`);
-                    
-                    // Reset form
-                    document.getElementById('orderLink').value = '';
-                    document.getElementById('totalPrice').innerText = '0.00';
-                    
-                } else {
-                    alert("Order Error: " + (data.message || "Unknown error"));
-                }
-                
-            } catch (error) {
-                console.error("Order error:", error);
-                alert("Failed to place order. Please try again later.");
-            } finally {
-                orderBtn.innerHTML = originalText;
-                orderBtn.disabled = false;
-            }
-        }
-        
-        // === SECURE ADMIN PANEL ===
-        async function loadAdminPanel() {
-            try {
-                const user = auth.currentUser;
-                if (!user || user.uid !== SECURITY_CONFIG.MASTER_ADMIN_UID) return;
-                
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/admin-data`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        uid: user.uid,
-                        token: securityToken,
-                        action: 'get_admin_data'
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Load users
-                    let html = '';
-                    data.users.forEach(userData => {
-                        const isSelf = userData.uid === SECURITY_CONFIG.MASTER_ADMIN_UID;
-                        html += `
-                            <div class="admin-user-card">
-                                <div class="user-info">
-                                    <h5>${userData.email || 'User'}</h5>
-                                    <div class="user-details">
-                                        <span>Bal: ₹${(userData.balance || 0).toFixed(2)}</span>
-                                        <span>Status: ${userData.status || 'Active'}</span>
-                                    </div>
-                                </div>
-                                <div class="admin-actions">
-                                    ${isSelf ? 
-                                        '<span style="font-size:12px; color:var(--primary); font-weight:600;">(Admin)</span>' : 
-                                        `
-                                        <button class="btn-sm btn-primary-sm" onclick="adminEditUser('${userData.uid}')">Edit</button>
-                                        <button class="btn-sm ${userData.status === 'blocked' ? 'btn-success-sm' : 'btn-warning-sm'}" 
-                                                onclick="adminToggleBlock('${userData.uid}', '${userData.status || 'active'}')">
-                                            ${userData.status === 'blocked' ? 'Unblock' : 'Block'}
-                                        </button>
-                                        `
-                                    }
-                                </div>
-                            </div>
-                        `;
-                    });
-                    document.getElementById('adminUserList').innerHTML = html || '<p style="text-align:center; color:var(--text-light);">No users found</p>';
-                    
-                    // Load payments
-                    let paymentHtml = '';
-                    if (data.payments && data.payments.length > 0) {
-                        data.payments.forEach(payment => {
-                            const statusColor = payment.status === 'verified_pending' ? 'var(--warning)' : 
-                                              payment.status === 'verification_failed' ? 'var(--danger)' : 'var(--text-light)';
-                            
-                            paymentHtml += `
-                                <div class="admin-user-card">
-                                    <div class="user-info">
-                                        <h5>${payment.name || payment.email || 'User'}</h5>
-                                        <div class="user-details">
-                                            <span>Amount: ₹${payment.amt.toFixed(2)}</span>
-                                            <span>UTR: ${payment.utr}</span>
-                                            <span style="color: ${statusColor}">${payment.status}</span>
-                                            <span>${new Date(payment.timestamp).toLocaleString()}</span>
-                                        </div>
-                                        ${payment.verificationMessage ? 
-                                            `<div style="font-size:12px; color:var(--text-light); margin-top:5px;">
-                                                <i class="fas fa-info-circle"></i> ${payment.verificationMessage}
-                                            </div>` : ''
-                                        }
-                                    </div>
-                                    <div class="admin-actions">
-                                        ${payment.status === 'verified_pending' ? 
-                                            `<button class="btn-sm btn-success-sm" onclick="adminApprovePayment('${payment.id}')">
-                                                Approve
-                                            </button>` : ''
-                                        }
-                                        <button class="btn-sm btn-danger-sm" onclick="adminRejectPayment('${payment.id}')">
-                                            ${payment.status === 'verification_failed' ? 'Delete' : 'Reject'}
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                    document.getElementById('adminPayments').innerHTML = paymentHtml || '<p style="text-align:center; color:var(--text-light);">No pending payment requests</p>';
-                }
-            } catch (error) {
-                console.error('Error loading admin panel:', error);
-                document.getElementById('adminUserList').innerHTML = '<p style="text-align:center; color:var(--danger);">Error loading admin data</p>';
-                document.getElementById('adminPayments').innerHTML = '<p style="text-align:center; color:var(--danger);">Error loading payments</p>';
-            }
-        }
-        
-        async function adminEditUser(uid) {
-            if (uid === SECURITY_CONFIG.MASTER_ADMIN_UID) {
-                alert("Cannot edit admin account!");
-                return;
-            }
-            
-            const newBal = prompt("Enter new balance:");
-            if (newBal !== null && !isNaN(parseFloat(newBal))) {
-                try {
-                    const user = auth.currentUser;
-                    const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/admin-update`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            uid: user.uid,
-                            targetUid: uid,
-                            field: 'balance',
-                            value: parseFloat(newBal),
-                            token: securityToken,
-                            action: 'update_user'
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        alert("Balance updated successfully!");
-                        loadAdminPanel();
-                    } else {
-                        alert("Error: " + data.message);
-                    }
-                } catch (error) {
-                    alert("Error updating balance: " + error.message);
-                }
-            }
-        }
-        
-        async function adminToggleBlock(uid, currentStatus) {
-            if (uid === SECURITY_CONFIG.MASTER_ADMIN_UID) {
-                alert("Cannot block admin account!");
-                return;
-            }
-            
-            const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
-            const action = newStatus === 'blocked' ? 'Block' : 'Unblock';
-            
-            if (confirm(`${action} this user?`)) {
-                try {
-                    const user = auth.currentUser;
-                    const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/admin-update`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            uid: user.uid,
-                            targetUid: uid,
-                            field: 'status',
-                            value: newStatus,
-                            token: securityToken,
-                            action: 'update_user'
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    if (data.success) {
-                        alert(`User ${action.toLowerCase()}ed successfully!`);
-                        loadAdminPanel();
-                    } else {
-                        alert("Error: " + data.message);
-                    }
-                } catch (error) {
-                    alert("Error updating user: " + error.message);
-                }
-            }
-        }
-        
-        async function adminApprovePayment(paymentId) {
-            if (!confirm("Approve this payment?")) return;
-            
-            try {
-                const user = auth.currentUser;
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/admin-update`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        uid: user.uid,
-                        paymentId: paymentId,
-                        action: 'approve_payment',
-                        token: securityToken
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    alert("Payment approved successfully!");
-                    loadAdminPanel();
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Error approving payment: " + error.message);
-            }
-        }
-        
-        async function adminRejectPayment(paymentId) {
-            if (!confirm("Reject this payment request?")) return;
-            
-            try {
-                const user = auth.currentUser;
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/admin-update`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        uid: user.uid,
-                        paymentId: paymentId,
-                        action: 'reject_payment',
-                        token: securityToken
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    alert("Payment rejected!");
-                    loadAdminPanel();
-                } else {
-                    alert("Error: " + data.message);
-                }
-            } catch (error) {
-                alert("Error rejecting payment: " + error.message);
-            }
-        }
-        
-        // === OTHER FUNCTIONS (Similar to before but secured) ===
+        // Fetch Services from API
         async function fetchServicesFromAPI() {
             const category = document.getElementById('catSelect').value;
             const srvSelect = document.getElementById('srvSelect');
@@ -2484,8 +1735,8 @@
             srvSelect.innerHTML = '<option value="">Loading services...</option>';
             
             try {
-                const response = await secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/get-services?category=${encodeURIComponent(category)}`);
-                const data = await response.json();
+                const res = await fetch(`${BACKEND_URL}/get-services?category=${encodeURIComponent(category)}`);
+                const data = await res.json();
                 
                 if (!data || data.length === 0) {
                     srvSelect.innerHTML = '<option value="">No services found</option>';
@@ -2506,6 +1757,7 @@
             }
         }
         
+        // Calculate Price
         function calculateAutoPrice() {
             const pricePerK = parseFloat(document.getElementById('srvSelect').value) || 0;
             const quantity = parseFloat(document.getElementById('orderQty').value) || 0;
@@ -2513,15 +1765,482 @@
             document.getElementById('totalPrice').innerText = totalPrice;
         }
         
-        // Load other data functions (orders, refills, etc.)
-        // ... [Previous functions with secureFetch where needed]
+        // Submit UTR
+        function submitUTR() {
+            const amt = document.getElementById('amtInp').value;
+            const utr = document.getElementById('utrInp').value;
+            
+            if (!amt || amt <= 0) {
+                alert("Please enter a valid amount!");
+                return;
+            }
+            
+            if (!utr || utr.trim().length < 8) {
+                alert("Please enter a valid UTR/Transaction ID!");
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('paymentRequests').push({
+                uid: user.uid,
+                email: user.email,
+                amt: parseFloat(amt),
+                utr: utr.trim(),
+                status: 'pending',
+                timestamp: Date.now(),
+                name: user.displayName || 'User'
+            }).then(() => {
+                alert("UTR submitted successfully! Admin will approve it soon.");
+                document.getElementById('qrDiv').style.display = 'none';
+                document.getElementById('amtInp').value = '';
+                document.getElementById('utrInp').value = '';
+            }).catch(error => {
+                alert("Error submitting UTR: " + error.message);
+            });
+        }
         
-        // === AUTH FUNCTIONS ===
+        // Load Admin Panel
+        function loadAdminPanel() {
+            // Load users
+            db.ref('users').on('value', snap => {
+                let html = '';
+                
+                snap.forEach(user => {
+                    const data = user.val();
+                    const isSelf = user.key === MY_UID;
+                    
+                    html += `
+                        <div class="admin-user-card">
+                            <div class="user-info">
+                                <h5>${data.email || 'User'}</h5>
+                                <div class="user-details">
+                                    <span>Bal: ₹${(data.balance || 0).toFixed(2)}</span>
+                                    <span>Status: ${data.status || 'Active'}</span>
+                                </div>
+                            </div>
+                            <div class="admin-actions">
+                                ${isSelf ? 
+                                    '<span style="font-size:12px; color:var(--primary); font-weight:600;">(Admin)</span>' : 
+                                    `
+                                    <button class="btn-sm btn-primary-sm" onclick="editBal('${user.key}')">Edit Balance</button>
+                                    <button class="btn-sm ${data.status === 'blocked' ? 'btn-success-sm' : 'btn-warning-sm'}" onclick="toggleBlock('${user.key}', '${data.status || 'active'}')">
+                                        ${data.status === 'blocked' ? 'Unblock' : 'Block'}
+                                    </button>
+                                    `
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('adminUserList').innerHTML = html || '<p style="text-align:center; color:var(--text-light);">No users found</p>';
+            });
+            
+            // Load payment requests
+            db.ref('paymentRequests').orderByChild('status').equalTo('pending').on('value', snap => {
+                let html = '';
+                
+                snap.forEach(payment => {
+                    const data = payment.val();
+                    
+                    html += `
+                        <div class="admin-user-card">
+                            <div class="user-info">
+                                <h5>${data.name || data.email || 'User'}</h5>
+                                <div class="user-details">
+                                    <span>Amount: ₹${data.amt.toFixed(2)}</span>
+                                    <span>UTR: ${data.utr}</span>
+                                    <span>${new Date(data.timestamp).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div class="admin-actions">
+                                <button class="btn-sm btn-success-sm" onclick="approveUTR('${payment.key}', '${data.uid}', ${data.amt})">
+                                    Approve
+                                </button>
+                                <button class="btn-sm btn-danger-sm" onclick="rejectUTR('${payment.key}')">
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('adminPayments').innerHTML = html || '<p style="text-align:center; color:var(--text-light);">No pending payment requests</p>';
+            });
+        }
+        
+        // Admin Functions
+        function approveUTR(key, uid, amt) {
+            if (!confirm(`Approve payment of ₹${amt.toFixed(2)}?`)) return;
+            
+            // Update user balance
+            db.ref('users/' + uid + '/balance').transaction(current => {
+                return (current || 0) + parseFloat(amt);
+            });
+            
+            // Update payment status
+            db.ref('paymentRequests/' + key + '/status').set('approved');
+            
+            alert("Payment approved successfully!");
+        }
+        
+        function rejectUTR(key) {
+            if (!confirm("Reject this payment request?")) return;
+            db.ref('paymentRequests/' + key).remove();
+        }
+        
+        function editBal(uid) {
+            if (uid === MY_UID) {
+                alert("Cannot edit admin balance!");
+                return;
+            }
+            
+            const newBal = prompt("Enter new balance:");
+            if (newBal !== null && !isNaN(parseFloat(newBal))) {
+                db.ref('users/' + uid + '/balance').set(parseFloat(newBal));
+            }
+        }
+        
+        function toggleBlock(uid, currentStatus) {
+            if (uid === MY_UID) {
+                alert("Cannot block admin account!");
+                return;
+            }
+            
+            const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
+            const action = newStatus === 'blocked' ? 'Block' : 'Unblock';
+            
+            if (confirm(`${action} this user?`)) {
+                db.ref('users/' + uid + '/status').set(newStatus);
+            }
+        }
+        
+        // Load Orders
+        function loadOrders() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('orders/' + user.uid).limitToLast(10).on('value', snap => {
+                let html = '';
+                
+                if (!snap.exists()) {
+                    html = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-light);">No orders yet</td></tr>';
+                } else {
+                    snap.forEach(order => {
+                        const data = order.val();
+                        const date = new Date(data.timestamp || Date.now());
+                        const statusClass = data.status === 'completed' ? 'status-completed' : 
+                                           data.status === 'failed' ? 'status-failed' : 'status-pending';
+                        
+                        html += `
+                            <tr>
+                                <td>${order.key.substring(0, 8)}</td>
+                                <td>${data.service || 'N/A'}</td>
+                                <td>${data.quantity || 0}</td>
+                                <td>₹${data.amount || '0.00'}</td>
+                                <td class="${statusClass}">${data.status || 'pending'}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                document.getElementById('ordersList').innerHTML = html;
+            });
+        }
+        
+        // Load Refill History
+        function loadRefillHistory() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('refills/' + user.uid).limitToLast(10).on('value', snap => {
+                let html = '';
+                
+                if (!snap.exists()) {
+                    html = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--text-light);">No refill history</td></tr>';
+                } else {
+                    snap.forEach(refill => {
+                        const data = refill.val();
+                        const date = new Date(data.timestamp || Date.now());
+                        const statusClass = data.status === 'completed' ? 'status-completed' : 
+                                           data.status === 'failed' ? 'status-failed' : 'status-pending';
+                        
+                        html += `
+                            <tr>
+                                <td>${refill.key.substring(0, 8)}</td>
+                                <td>${data.service || 'N/A'}</td>
+                                <td>${date.toLocaleDateString()}</td>
+                                <td class="${statusClass}">${data.status || 'pending'}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                document.getElementById('refillList').innerHTML = html;
+            });
+        }
+        
+        // Load All Services
+        async function loadAllServices() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/get-services`);
+                const data = await res.json();
+                
+                if (!data || data.length === 0) {
+                    document.getElementById('allServices').innerHTML = '<p style="text-align: center; color: var(--text-light);">No services available</p>';
+                    return;
+                }
+                
+                // Group services by category
+                const categories = {};
+                data.forEach(service => {
+                    if (!categories[service.category]) {
+                        categories[service.category] = [];
+                    }
+                    let apiPrice = parseFloat(service.price) || 0;
+                    let finalPrice = apiPrice + (apiPrice * (globalComm / 100));
+                    categories[service.category].push({
+                        name: service.name,
+                        price: finalPrice.toFixed(2),
+                        min: service.min || 100,
+                        max: service.max || 10000
+                    });
+                });
+                
+                let html = '';
+                for (const category in categories) {
+                    html += `
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid rgba(99, 102, 241, 0.3); padding-bottom: 5px;">${category}</h3>
+                    `;
+                    
+                    categories[category].forEach(service => {
+                        html += `
+                            <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">${service.name}</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Min: ${service.min} | Max: ${service.max}</div>
+                                </div>
+                                <div style="color: var(--accent); font-weight: 700;">₹${service.price}/1k</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+                
+                document.getElementById('allServices').innerHTML = html;
+            } catch (error) {
+                console.error("Error loading services:", error);
+                document.getElementById('allServices').innerHTML = '<p style="text-align: center; color: var(--danger);">Error loading services</p>';
+            }
+        }
+        
+        // Create Ticket
+        function createTicket() {
+            const subject = document.getElementById('ticketSubject').value;
+            const message = document.getElementById('ticketMessage').value;
+            
+            if (!subject || !message) {
+                alert("Please fill all fields!");
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const ticketId = 'TICKET' + Date.now();
+            db.ref('tickets/' + user.uid + '/' + ticketId).set({
+                subject: subject,
+                message: message,
+                status: 'open',
+                timestamp: Date.now(),
+                email: user.email,
+                name: user.displayName || 'User'
+            }).then(() => {
+                alert("Ticket created successfully!");
+                document.getElementById('ticketSubject').value = '';
+                document.getElementById('ticketMessage').value = '';
+                loadTickets();
+            }).catch(error => {
+                alert("Error creating ticket: " + error.message);
+            });
+        }
+        
+        // Load Tickets
+        function loadTickets() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('tickets/' + user.uid).limitToLast(5).on('value', snap => {
+                let html = '';
+                
+                if (!snap.exists()) {
+                    html = '<p style="text-align: center; color: var(--text-light); padding: 20px;">No tickets yet</p>';
+                } else {
+                    snap.forEach(ticket => {
+                        const data = ticket.val();
+                        const date = new Date(data.timestamp);
+                        const statusClass = data.status === 'closed' ? 'status-completed' : 
+                                           data.status === 'open' ? 'status-pending' : '';
+                        
+                        html += `
+                            <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <div style="font-weight: 600;">${data.subject}</div>
+                                    <span class="${statusClass}" style="font-size: 12px;">${data.status || 'open'}</span>
+                                </div>
+                                <div style="color: var(--text-light); font-size: 14px; margin-bottom: 8px;">${data.message}</div>
+                                <div style="font-size: 12px; color: var(--text-light);">${date.toLocaleString()}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('ticketsList').innerHTML = html;
+            });
+        }
+        
+        // Load API Key
+        function loadAPIKey() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('apiKeys/' + user.uid).once('value').then(snap => {
+                if (snap.exists()) {
+                    document.getElementById('apiKeyDisplay').innerText = snap.val().key || 'No API key found';
+                } else {
+                    document.getElementById('apiKeyDisplay').innerText = 'No API key generated yet';
+                }
+            });
+        }
+        
+        // Generate API Key
+        function generateAPIKey() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const apiKey = 'DG_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            db.ref('apiKeys/' + user.uid).set({
+                key: apiKey,
+                created: Date.now()
+            }).then(() => {
+                document.getElementById('apiKeyDisplay').innerText = apiKey;
+                alert("New API key generated successfully!");
+            }).catch(error => {
+                alert("Error generating API key: " + error.message);
+            });
+        }
+        
+        // Load Referral Data
+        function loadReferralData() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Generate referral code from user ID
+            const referralCode = 'DG' + user.uid.substring(0, 8).toUpperCase();
+            const referralLink = window.location.origin + window.location.pathname + '?ref=' + referralCode;
+            
+            document.getElementById('referralCode').innerText = referralLink;
+            
+            // Load referral stats
+            db.ref('referrals/' + user.uid).once('value').then(snap => {
+                const data = snap.val() || { count: 0, earned: 0 };
+                document.getElementById('refCount').innerText = data.count || 0;
+                document.getElementById('refEarned').innerText = '₹' + (data.earned || 0).toFixed(2);
+            });
+        }
+        
+        // Copy Referral Link
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralCode').innerText;
+            navigator.clipboard.writeText(referralLink).then(() => {
+                alert("Referral link copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        }
+        
+        // Navigation Functions
+        function openPage(pageId, element) {
+            // Update pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update sidebar items
+            if (element) {
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+            
+            // Update bottom nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (pageId === 'home') {
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (pageId === 'addfund') {
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (pageId === 'orders') {
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            } else if (pageId === 'support') {
+                document.querySelectorAll('.nav-item')[3].classList.add('active');
+            }
+            
+            // Close sidebar on mobile
+            toggleSidebar(false);
+            
+            // Refresh data for certain pages
+            if (pageId === 'services') {
+                loadAllServices();
+            } else if (pageId === 'orders') {
+                loadOrders();
+            } else if (pageId === 'tickets') {
+                loadTickets();
+            }
+        }
+        
+        function toggleSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            if (show !== undefined) {
+                sidebar.classList.toggle('active', show);
+            } else {
+                sidebar.classList.toggle('active');
+            }
+        }
+        
+        // Auth Functions
         function doGoogleAuth() {
             auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
                 .catch(error => {
                     alert("Google sign-in failed: " + error.message);
                 });
+        }
+        
+        function genQR() {
+            const amount = document.getElementById('amtInp').value;
+            
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount first!");
+                return;
+            }
+            
+            const upiId = "aqdaskhan03@fam";
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${encodeURIComponent(upiId)}&am=${amount}&cu=INR&tn=DG Social Service Payment`;
+            
+            document.getElementById('qrImg').src = qrUrl;
+            document.getElementById('qrDiv').style.display = 'block';
+            
+            // Scroll to QR
+            document.getElementById('qrDiv').scrollIntoView({ behavior: 'smooth' });
         }
         
         function doLogout() {
@@ -2567,90 +2286,131 @@
             
             auth.createUserWithEmailAndPassword(email, password)
                 .then(result => {
+                    // Update profile
                     return result.user.updateProfile({
                         displayName: name
                     }).then(() => {
-                        return secureFetch(`${SECURITY_CONFIG.BACKEND_URL}/create-user`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                uid: result.user.uid,
-                                email: email,
-                                name: name,
-                                token: generateSecurityToken(result.user.uid)
-                            })
+                        // Create user in database
+                        return db.ref('users/' + result.user.uid).set({
+                            email: email,
+                            name: name,
+                            balance: 0,
+                            status: 'active',
+                            createdAt: Date.now()
                         });
                     });
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("Account created successfully! You are now logged in.");
-                    } else {
-                        alert("Signup failed: " + data.message);
-                        auth.signOut();
-                    }
+                .then(() => {
+                    alert("Account created successfully! You are now logged in.");
                 })
                 .catch(error => {
                     alert("Signup failed: " + error.message);
                 });
         }
         
-        // === NAVIGATION ===
-        function openPage(pageId, element) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
+        // Place Order
+        async function placeFinalOrder() {
+            const srvSelect = document.getElementById('srvSelect');
+            const serviceId = srvSelect.options[srvSelect.selectedIndex]?.getAttribute('data-id');
+            const link = document.getElementById('orderLink').value;
+            const qty = document.getElementById('orderQty').value;
+            const total = parseFloat(document.getElementById('totalPrice').innerText);
             
-            if (element) {
-                document.querySelectorAll('.menu-item').forEach(item => {
-                    item.classList.remove('active');
+            // Validation
+            if (!serviceId) {
+                alert("Please select a service!");
+                return;
+            }
+            
+            if (!link || link.trim().length < 3) {
+                alert("Please enter a valid link or username!");
+                return;
+            }
+            
+            if (!qty || qty < 10) {
+                alert("Quantity must be at least 10!");
+                return;
+            }
+            
+            if (total <= 0) {
+                alert("Total price must be greater than 0!");
+                return;
+            }
+            
+            // Check balance
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const balanceSnap = await db.ref('users/' + user.uid + '/balance').once('value');
+            const currentBal = balanceSnap.val() || 0;
+            
+            if (currentBal < total) {
+                alert(`Insufficient balance! You need ₹${total.toFixed(2)} but have only ₹${currentBal.toFixed(2)}`);
+                return;
+            }
+            
+            // Confirm order
+            if (!confirm(`Confirm order for ₹${total.toFixed(2)}?`)) return;
+            
+            // Update button
+            const orderBtn = document.getElementById('orderBtn');
+            const originalText = orderBtn.innerHTML;
+            orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            orderBtn.disabled = true;
+            
+            try {
+                // Place order with backend
+                const res = await fetch(`${BACKEND_URL}/place-order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        service: serviceId, 
+                        link: link.trim(), 
+                        quantity: qty 
+                    })
                 });
-                element.classList.add('active');
-            }
-            
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            if (pageId === 'home') {
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            } else if (pageId === 'addfund') {
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-            } else if (pageId === 'orders') {
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-            } else if (pageId === 'support') {
-                document.querySelectorAll('.nav-item')[3].classList.add('active');
-            }
-            
-            toggleSidebar(false);
-            
-            if (pageId === 'services') {
-                loadAllServices();
-            } else if (pageId === 'orders') {
-                const user = auth.currentUser;
-                if (user) loadOrders(user.uid);
-            } else if (pageId === 'tickets') {
-                const user = auth.currentUser;
-                if (user) loadTickets(user.uid);
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    // Deduct balance
+                    await db.ref('users/' + user.uid + '/balance').set(currentBal - total);
+                    
+                    // Save order to user's orders
+                    const orderId = 'ORDER' + Date.now();
+                    await db.ref('orders/' + user.uid + '/' + orderId).set({
+                        service: serviceId,
+                        link: link,
+                        quantity: qty,
+                        amount: total,
+                        status: 'pending',
+                        timestamp: Date.now()
+                    });
+                    
+                    // Show success
+                    alert(`Order placed successfully!\nOrder ID: ${data.orderId || orderId}\nAmount: ₹${total.toFixed(2)}\nRemaining Balance: ₹${(currentBal - total).toFixed(2)}`);
+                    
+                    // Reset form
+                    document.getElementById('orderLink').value = '';
+                    document.getElementById('totalPrice').innerText = '0.00';
+                    
+                } else {
+                    alert("Order Error: " + (data.message || "Unknown error"));
+                }
+                
+            } catch (error) {
+                console.error("Order error:", error);
+                alert("Failed to place order. Please try again later.");
+            } finally {
+                // Reset button
+                orderBtn.innerHTML = originalText;
+                orderBtn.disabled = false;
             }
         }
         
-        function toggleSidebar(show) {
-            const sidebar = document.getElementById('sidebar');
-            if (show !== undefined) {
-                sidebar.classList.toggle('active', show);
-            } else {
-                sidebar.classList.toggle('active');
-            }
-        }
-        
-        // === INITIALIZE ===
+        // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
-            // Security event listeners
+            // Add click outside sidebar to close
             document.addEventListener('click', function(event) {
                 const sidebar = document.getElementById('sidebar');
                 const menuToggle = document.querySelector('.menu-toggle');
@@ -2662,6 +2422,7 @@
                 }
             });
             
+            // Close sidebar when clicking on a menu item (for mobile)
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.addEventListener('click', function() {
                     if (window.innerWidth <= 768) {
@@ -2670,86 +2431,13 @@
                 });
             });
             
-            // Referral parameter check
+            // Check for referral parameter in URL
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if (refCode && !auth.currentUser) {
                 localStorage.setItem('referralCode', refCode);
             }
-            
-            // Periodic security check
-            setInterval(() => {
-                if (!validateSecurityToken(securityToken)) {
-                    alert('Session expired! Please login again.');
-                    auth.signOut();
-                }
-            }, 300000); // 5 minutes
         });
-        
-        // Note: The following functions need to be implemented in your backend:
-        // 1. /get-balance - Securely returns user balance
-        // 2. /verify-payment - Verifies and processes payments
-        // 3. /place-order - Processes orders and deducts balance
-        // 4. /admin-data - Returns admin panel data
-        // 5. /admin-update - Processes admin actions
-        // 6. /create-user - Creates new user in database
-        // 7. /get-commission - Gets commission rate
-        // 8. /update-commission - Updates commission rate
-        
-        // === BACKEND IMPLEMENTATION GUIDE ===
-        /*
-        You need to create a backend server (Node.js/Python/PHP) with these endpoints.
-        The backend should:
-        1. Validate security tokens
-        2. Handle all balance updates
-        3. Process payments securely
-        4. Manage admin functions
-        5. Store sensitive data securely
-        
-        Example Node.js backend structure:
-        - app.js (Express server)
-        - routes/
-          - auth.js (authentication)
-          - payments.js (payment processing)
-          - admin.js (admin functions)
-          - orders.js (order processing)
-        - middleware/
-          - security.js (token validation)
-        - controllers/
-          - balanceController.js
-          - paymentController.js
-        */
-        
-        // For now, use fallback functions for demo
-        function loadOrders(uid) {
-            db.ref('orders/' + uid).limitToLast(10).on('value', snap => {
-                let html = '';
-                if (!snap.exists()) {
-                    html = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-light);">No orders yet</td></tr>';
-                } else {
-                    snap.forEach(order => {
-                        const data = order.val();
-                        const date = new Date(data.timestamp || Date.now());
-                        const statusClass = data.status === 'completed' ? 'status-completed' : 
-                                           data.status === 'failed' ? 'status-failed' : 'status-pending';
-                        
-                        html += `
-                            <tr>
-                                <td>${order.key.substring(0, 8)}</td>
-                                <td>${data.service || 'N/A'}</td>
-                                <td>${data.quantity || 0}</td>
-                                <td>₹${data.amount || '0.00'}</td>
-                                <td class="${statusClass}">${data.status || 'pending'}</td>
-                            </tr>
-                        `;
-                    });
-                }
-                document.getElementById('ordersList').innerHTML = html;
-            });
-        }
-        
-        // ... [Other load functions remain similar]
-        
     </script>
 </body>
 </html>
