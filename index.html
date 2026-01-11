@@ -166,12 +166,13 @@
         .btn-google {
             background: white;
             color: #333;
-            margin-top: 15px;
+            margin-top: 10px;
             border: 1px solid #ddd;
         }
 
         .btn-google:hover {
             background: #f8f9fa;
+            transform: translateY(-2px);
         }
 
         .auth-switch {
@@ -247,12 +248,12 @@
 
         .wallet-card {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1));
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 12px;
             border: 1px solid rgba(99, 102, 241, 0.3);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
             transition: var(--transition);
         }
@@ -264,13 +265,13 @@
 
         .wallet-icon {
             color: var(--accent);
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .wallet-balance {
             color: var(--accent);
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         /* Sidebar */
@@ -297,7 +298,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -317,6 +318,52 @@
             font-size: 18px;
             font-weight: 700;
             color: var(--primary);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-user:hover {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info-sidebar {
+            flex: 1;
+        }
+
+        .user-name-sidebar {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .user-email-sidebar {
+            font-size: 11px;
+            color: var(--text-light);
         }
 
         .sidebar-menu {
@@ -729,21 +776,55 @@
             background: rgba(99, 102, 241, 0.1);
             border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         .commission-value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--primary);
+            margin-bottom: 10px;
         }
 
         .commission-label {
             color: var(--text-light);
-            font-size: 14px;
-            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        /* Commission Input Box */
+        .commission-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .commission-input-box {
+            flex: 1;
+        }
+
+        .commission-input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .commission-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .commission-input::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
         }
 
         /* Orders Table */
@@ -830,6 +911,7 @@
                 <span>DG SOCIAL SERVICE</span>
             </div>
             
+            <!-- Login Form -->
             <div id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label class="form-label">Email Address</label>
@@ -856,6 +938,7 @@
                 </div>
             </div>
             
+            <!-- Signup Form -->
             <div id="signupForm" class="auth-form" style="display: none;">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -869,11 +952,16 @@
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" id="signupPass" placeholder="Create a password" class="input-field">
+                    <input type="password" id="signupPass" placeholder="Create a password (min. 6 characters)" class="input-field">
                 </div>
                 
                 <button class="btn btn-primary" onclick="doSignup()">
                     <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Sign up with Google
                 </button>
                 
                 <div class="auth-switch">
@@ -893,6 +981,18 @@
                     <i class="fas fa-rocket"></i>
                 </div>
                 <div class="sidebar-title">DG PANEL</div>
+            </div>
+            
+            <!-- User Profile in Sidebar -->
+            <div class="sidebar-user" onclick="openPage('profile')">
+                <div class="user-avatar">
+                    <img id="sidebarPfp" src="" alt="Profile">
+                </div>
+                <div class="user-info-sidebar">
+                    <div class="user-name-sidebar" id="sidebarName">User</div>
+                    <div class="user-email-sidebar" id="sidebarEmail">user@email.com</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light); font-size: 12px;"></i>
             </div>
             
             <div class="sidebar-menu">
@@ -943,7 +1043,7 @@
                 
                 <a class="menu-item" onclick="openPage('profile', this)">
                     <i class="fas fa-user-circle"></i>
-                    <span>Profile</span>
+                    <span>My Profile</span>
                 </a>
                 
                 <a id="adminBtn" class="menu-item" style="display: none; color: #f87171;" onclick="openPage('admin', this)">
@@ -969,7 +1069,7 @@
             <div class="wallet-card" onclick="openPage('addfund')">
                 <i class="fas fa-wallet wallet-icon"></i>
                 <div>
-                    <div style="font-size: 12px; color: var(--text-light);">Balance</div>
+                    <div style="font-size: 11px; color: var(--text-light);">Balance</div>
                     <div class="wallet-balance">₹<span id="balText">0.00</span></div>
                 </div>
             </div>
@@ -1445,11 +1545,11 @@
                         
                         <p style="color: var(--text-light); margin-bottom: 20px;">Set commission percentage added to all service prices</p>
                         
-                        <div style="display: flex; gap: 15px; align-items: center;">
-                            <div style="flex: 1;">
-                                <input type="number" id="commInput" placeholder="Enter commission percentage" class="input-field" min="0" max="100" step="0.5">
+                        <div class="commission-input-container">
+                            <div class="commission-input-box">
+                                <input type="number" id="commInput" placeholder="Enter commission percentage (e.g., 15.5 for 15.5%)" class="commission-input" min="0" max="100" step="0.5">
                             </div>
-                            <button class="btn btn-primary-sm" onclick="updateComm()" style="padding: 14px 25px;">
+                            <button class="btn btn-primary-sm" onclick="updateComm()" style="padding: 16px 30px; font-size: 16px;">
                                 Update Commission
                             </button>
                         </div>
@@ -1556,9 +1656,18 @@
                 document.getElementById('app').style.display = 'block';
                 
                 // Update user profile
-                document.getElementById('uName').innerText = user.displayName || 'User';
-                document.getElementById('uEmail').innerText = user.email;
-                document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.email || 'User') + "&background=6366f1&color=fff";
+                const displayName = user.displayName || 'User';
+                const email = user.email || 'user@email.com';
+                const photoURL = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName) + "&background=6366f1&color=fff";
+                
+                document.getElementById('uName').innerText = displayName;
+                document.getElementById('uEmail').innerText = email;
+                document.getElementById('uPfp').src = photoURL;
+                
+                // Update sidebar profile
+                document.getElementById('sidebarName').innerText = displayName;
+                document.getElementById('sidebarEmail').innerText = email;
+                document.getElementById('sidebarPfp').src = photoURL;
                 
                 // Load commission
                 db.ref('settings/commission').on('value', snap => {
@@ -1606,7 +1715,7 @@
             }
             
             db.ref('settings/commission').set(val).then(() => {
-                alert("Commission updated successfully!");
+                alert("Commission updated successfully to " + val + "%!");
                 document.getElementById('currentCommission').innerText = val + "%";
             }).catch(error => {
                 alert("Error updating commission: " + error.message);
