@@ -1,385 +1,1665 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>DG SOCIAL SERVICE – Premium Panel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>DG SOCIAL SERVICE - Premium Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --bg-light: #1e293b;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-border: rgba(99, 102, 241, 0.2);
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --sidebar-bg: #0f172a;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
-:root {
-    --primary: #3b82f6;
-    --accent: #10b981;
-    --bg: #020617;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --border: rgba(255, 255, 255, 0.1);
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-* { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
-.bg-glow { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% -20%, #1e40af 0%, transparent 50%); }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
 
-/* MENU TRIGGER */
-.menu-trigger {
-    width: 38px; height: 38px; background: rgba(59, 130, 246, 0.1);
-    border: 1px solid var(--primary); border-radius: 10px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-    cursor: pointer; transition: 0.3s;
-}
-.menu-trigger span { display: block; width: 18px; height: 1.5px; background: var(--primary); border-radius: 10px; }
+        /* Glow effects */
+        .glow-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                       radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+        }
 
-.top-bar {
-    padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
-    background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px);
-    position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border);
-}
+        /* Auth Screen */
+        #authBox {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg);
+        }
 
-.wallet-box {
-    background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 50px;
-    border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
-}
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 35px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.5s ease-out;
+        }
 
-/* SIDEBAR */
-.sidebar {
-    position: fixed; top: 0; left: -240px; width: 230px; 
-    height: 100%; background: #020617; border-right: 1px solid var(--border);
-    z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px 20px;
-}
-.sidebar.active { left: 0; box-shadow: 10px 0 40px rgba(0,0,0,0.7); }
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 700;
+        }
 
-.side-item {
-    padding: 12px; border-radius: 10px; margin-bottom: 5px; cursor: pointer;
-    color: #94a3b8; display: flex; align-items: center; gap: 10px; font-size: 15px;
-}
-.side-item.active { background: rgba(59, 130, 246, 0.1); color: #fff; border: 1px solid var(--border); }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
 
-.page { display: none; padding: 15px; animation: fadeIn 0.3s ease; max-width: 550px; margin: auto; padding-bottom: 80px; }
-.page.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .auth-form {
+            margin-top: 25px;
+        }
 
-.premium-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 20px; margin-bottom: 15px; }
-.input-style { width: 100%; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
-.btn-glow { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
 
-/* SUPPORT CARDS */
-.sup-card { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 10px; text-decoration: none; color: #fff; }
-.sup-icon { font-size: 24px; width: 40px; text-align: center; }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 500;
+        }
 
-/* ADMIN UI */
-.admin-user-row { border-bottom: 1px solid var(--border); padding: 12px 0; font-size: 13px; display: flex; flex-direction: column; gap: 8px; }
-.admin-actions { display: flex; gap: 8px; }
-.btn-sm { padding: 6px 12px; border-radius: 8px; border: none; font-size: 11px; cursor: pointer; color: #fff; font-weight: bold; }
+        .input-field {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+        }
 
-.bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0f172a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid var(--border); z-index: 100; }
-.nav-tab { color: #64748b; font-size: 11px; text-align: center; cursor: pointer; }
-.nav-tab.active { color: var(--primary); }
-</style>
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-google {
+            background: white;
+            color: #333;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+        }
+
+        .auth-switch {
+            margin-top: 25px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .auth-link {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        /* App Container */
+        #app {
+            display: none;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-toggle {
+            width: 44px;
+            height: 44px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: scale(1.05);
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .menu-toggle span:nth-child(2) {
+            width: 16px;
+            align-self: flex-start;
+            margin-left: 2px;
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1));
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .wallet-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .wallet-icon {
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .wallet-balance {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 260px;
+            height: 100%;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+            padding: 25px 20px;
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-logo {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--text);
+            border-left: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            width: 20px;
+            font-size: 18px;
+        }
+
+        .menu-item.logout {
+            margin-top: 30px;
+            color: var(--danger);
+            border-left: 3px solid var(--danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Order Form */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .select-field, .input-field {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+            appearance: none;
+        }
+
+        .select-field:focus, .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .price-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .price-amount {
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 24px;
+        }
+
+        /* Support Cards */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .support-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .support-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .support-info p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Profile */
+        .profile-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            margin: 0 auto 20px;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* Admin Panel */
+        .admin-section {
+            margin-bottom: 30px;
+        }
+
+        .admin-user-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info h5 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .user-details {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary-sm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-warning-sm {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-success-sm {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger-sm {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 5px 15px;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 30px 25px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="glow-effect"></div>
 
-<div class="bg-glow"></div>
-
-<div id="authBox" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
-    <div class="premium-card" style="width:100%; max-width:350px; text-align:center;">
-        <h2 style="color:var(--primary); margin:0;">DG SOCIAL SERVICE</h2>
-        <div id="loginForm" style="margin-top:20px">
-            <input type="email" id="loginEmail" placeholder="Email" class="input-style">
-            <input type="password" id="loginPass" placeholder="Password" class="input-style">
-            <button class="btn-glow" onclick="doLogin()">Sign In</button>
-            <button class="btn-glow" style="background:#fff; color:#000; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px" onclick="doGoogleAuth()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16"> Google Login
-            </button>
-            <p onclick="toggleAuth(false)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">New User? Register</p>
-        </div>
-        <div id="signupForm" style="display:none; margin-top:20px">
-            <input type="text" id="signupName" placeholder="Full Name" class="input-style">
-            <input type="email" id="signupEmail" placeholder="Email" class="input-style">
-            <input type="password" id="signupPass" placeholder="Password" class="input-style">
-            <button class="btn-glow" onclick="doSignup()">Register</button>
-            <p onclick="toggleAuth(true)" style="color:var(--primary); font-size:14px; margin-top:15px; cursor:pointer">Back to Login</p>
-        </div>
-    </div>
-</div>
-
-<div id="app" style="display:none">
-    <div class="sidebar" id="sidebar">
-        <h3 style="color:var(--primary); margin-bottom:20px">DG MENU</h3>
-        <div class="side-item active" onclick="openPage('home', this)">🏠 New Order</div>
-        <div class="side-item" onclick="openPage('addfund', this)">💳 Add Fund</div>
-        <div class="side-item" onclick="openPage('support', this)">🎧 Support</div>
-        <div class="side-item" onclick="openPage('profile', this)">👤 Profile</div>
-        <div id="adminBtn" class="side-item" style="display:none; color:#f87171" onclick="openPage('admin', this)">🔐 Admin Panel</div>
-        <div class="side-item" onclick="doLogout()" style="color:#ef4444; margin-top:30px">🚪 Logout</div>
-    </div>
-
-    <div class="top-bar">
-        <div class="menu-trigger" onclick="toggleSidebar(true)">
-            <span></span><span style="width:12px; align-self: flex-start; margin-left: 2px;"></span><span></span>
-        </div>
-        <div class="wallet-box" onclick="openPage('addfund')">
-            <span style="color:var(--accent); font-weight:bold;">₹<span id="balText">0.00</span></span>
-        </div>
-    </div>
-
-    <div id="home" class="page active">
-        <div class="premium-card">
-            <h4>⚡ Create New Order</h4>
-            <select id="catSelect" class="input-style" onchange="fetchServicesFromAPI()">
-                <option value="">Select Category</option>
-                <option value="Instagram">Instagram</option>
-                <option value="YouTube">YouTube</option>
-                <option value="Telegram">Telegram</option>
-                <option value="Facebook">Facebook</option>
-            </select>
-            <select id="srvSelect" class="input-style" onchange="calculateAutoPrice()">
-                <option value="">Choose Service</option>
-            </select>
-            <input type="text" id="orderLink" placeholder="Link / Username" class="input-style">
-            <input type="number" id="orderQty" value="100" class="input-style" oninput="calculateAutoPrice()">
-            <div style="background:rgba(16, 185, 129, 0.1); padding:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-                <span style="color:#64748b">Price:</span><span style="color:var(--accent); font-weight:bold">₹<span id="totalPrice">0.00</span></span>
-            </div>
-            <button class="btn-glow" id="orderBtn" onclick="placeFinalOrder()">Place Order</button>
-        </div>
-    </div>
-
-    <div id="support" class="page">
-        <h3>🎧 Support</h3>
-        <a href="https://wa.me/917775965170" target="_blank" class="premium-card" style="display:block; text-decoration:none;">💬 WhatsApp Chat</a>
-        <a href="https://t.me/dgservice_support" target="_blank" class="premium-card" style="display:block; text-decoration:none;">✈️ Telegram Support</a>
-        <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="premium-card" style="display:block; text-decoration:none;">📸 Instagram</a>
-    </div>
-
-    <div id="addfund" class="page">
-        <div class="premium-card">
-            <h3>💳 Add Funds</h3>
-            <p>UPI ID: <b style="color:var(--primary)">aqdaskhan03@fam</b></p>
-            <input type="number" id="amtInp" placeholder="Amount" class="input-style">
-            <button class="btn-glow" onclick="genQR()">Generate QR</button>
-            <div id="qrDiv" style="display:none; text-align:center; margin-top:15px">
-                <img id="qrImg" src="" style="border:4px solid white; border-radius:12px; width:180px">
-                <input type="text" id="utrInp" placeholder="UTR Number" class="input-style" style="margin-top:12px">
-                <button class="btn-glow" onclick="submitUTR()">Confirm Payment</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="profile" class="page">
-        <div class="premium-card" style="text-align:center">
-            <img id="uPfp" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--primary); margin-bottom:10px">
-            <h3 id="uName">User</h3>
-            <p id="uEmail" style="color:#64748b"></p>
-        </div>
-    </div>
-
-    <div id="admin" class="page">
-        <h3>🔐 Super Admin Dashboard</h3>
-        
-        <div class="premium-card">
-            <h4>💰 Rate Commission (%)</h4>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="commInput" placeholder="e.g. 10" class="input-style" style="margin-bottom:0">
-                <button class="btn-sm" style="background:var(--primary); width:120px" onclick="updateComm()">Update Rate</button>
-            </div>
-            <small style="color:#64748b; margin-top:5px; display:block;">Add extra percentage to API prices.</small>
-        </div>
-
-        <div class="premium-card">
-            <h4>User Management</h4>
-            <div id="adminUserList"></div>
-        </div>
-        <div class="premium-card">
-            <h4>UTR Requests</h4>
-            <div id="adminPayments"></div>
-        </div>
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-tab active" onclick="openPage('home', this)">🏠<br>Home</div>
-        <div class="nav-tab" onclick="openPage('addfund', this)">💰<br>Fund</div>
-        <div class="nav-tab" onclick="openPage('support', this)">🎧<br>Help</div>
-    </div>
-</div>
-
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
-    authDomain: "otp-service-74871.firebaseapp.com",
-    databaseURL: "https://otp-service-74871-default-rtdb.firebaseio.com"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(), db = firebase.database();
-
-const MY_UID = "ndjVRXUrm7byZUhfAMnIBhxUA0F3";
-const BACKEND_URL = "https://dg-otp-backend.onrender.com";
-
-let globalComm = 0; // Local commission state
-
-auth.onAuthStateChanged(user => {
-    if(user){
-        db.ref('users/'+user.uid+'/status').on('value', s => {
-            if(s.val() === 'blocked'){ alert("Blocked!"); auth.signOut(); }
-        });
-        document.getElementById('authBox').style.display='none';
-        document.getElementById('app').style.display='block';
-        document.getElementById('uName').innerText = user.displayName || 'User';
-        document.getElementById('uEmail').innerText = user.email;
-        document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name="+user.email;
-        
-        // Load Live Commission from Firebase
-        db.ref('settings/commission').on('value', snap => {
-            globalComm = snap.val() || 0;
-            if(user.uid === MY_UID) document.getElementById('commInput').value = globalComm;
-        });
-
-        if(user.uid === MY_UID) {
-            document.getElementById('adminBtn').style.display='flex';
-            loadAdminPanel();
-        }
-        db.ref('users/' + user.uid + '/balance').on('value', s => document.getElementById('balText').innerText = (s.val() || 0).toFixed(2));
-    } else {
-        document.getElementById('authBox').style.display='flex'; document.getElementById('app').style.display='none';
-    }
-});
-
-// COMMISSION UPDATE
-function updateComm() {
-    const val = document.getElementById('commInput').value;
-    db.ref('settings/commission').set(parseFloat(val)).then(() => alert("Commission Updated!"));
-}
-
-async function fetchServicesFromAPI() {
-    const category = document.getElementById('catSelect').value;
-    const srvSelect = document.getElementById('srvSelect');
-    srvSelect.innerHTML = '<option>Loading...</option>';
-    try {
-        const res = await fetch(`${BACKEND_URL}/get-services?category=${category}`);
-        const data = await res.json();
-        srvSelect.innerHTML = '<option value="">Choose Service</option>';
-        data.forEach(s => {
-            // Apply Commission to API price
-            let apiPrice = parseFloat(s.price);
-            let finalPrice = apiPrice + (apiPrice * (globalComm / 100));
-            srvSelect.innerHTML += `<option value="${finalPrice}" data-id="${s.id}">${s.name} - ₹${finalPrice.toFixed(2)}</option>`;
-        });
-    } catch(e) { srvSelect.innerHTML = '<option>API Error</option>'; }
-}
-
-// REST OF THE FUNCTIONS REMAIN SAME AS index (4).html
-function calculateAutoPrice() {
-    const p = document.getElementById('srvSelect').value || 0;
-    const q = document.getElementById('orderQty').value || 0;
-    document.getElementById('totalPrice').innerText = (p * (q/1000)).toFixed(2);
-}
-
-function submitUTR() {
-    const amt = document.getElementById('amtInp').value;
-    const utr = document.getElementById('utrInp').value;
-    if(!amt || !utr) return alert("Fill fields!");
-    db.ref('paymentRequests').push({
-        uid: auth.currentUser.uid,
-        email: auth.currentUser.email,
-        amt: parseFloat(amt),
-        utr: utr,
-        status: 'pending',
-        timestamp: Date.now()
-    }).then(() => {
-        alert("UTR Sent to Admin!");
-        document.getElementById('qrDiv').style.display='none';
-    });
-}
-
-function loadAdminPanel() {
-    db.ref('users').on('value', snap => {
-        let h = '';
-        snap.forEach(u => {
-            const d = u.val();
-            const isSelf = u.key === MY_UID;
-            h += `<div class="admin-user-row">
-                <b>${d.email || 'User'}</b>
-                <span>Bal: ₹${(d.balance || 0).toFixed(2)} | Status: ${d.status || 'Active'}</span>
-                <div class="admin-actions">
-                    ${isSelf ? '<span style="font-size:11px;">(Master Admin)</span>' : `
-                    <button class="btn-sm" style="background:var(--primary)" onclick="editBal('${u.key}')">Edit</button>
-                    <button class="btn-sm" style="background:#f59e0b" onclick="toggleBlock('${u.key}','${d.status}')">Status</button>
-                    `}
+    <!-- Authentication Screen -->
+    <div id="authBox">
+        <div class="auth-card">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
                 </div>
-            </div>`;
-        });
-        document.getElementById('adminUserList').innerHTML = h;
-    });
+                <span>DG SOCIAL SERVICE</span>
+            </div>
+            
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter your password" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Continue with Google
+                </button>
+                
+                <div class="auth-switch">
+                    New to DG Social Service? 
+                    <span class="auth-link" onclick="toggleAuth(false)">Create Account</span>
+                </div>
+            </div>
+            
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signupPass" placeholder="Create a password" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doSignup()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <div class="auth-switch">
+                    Already have an account? 
+                    <span class="auth-link" onclick="toggleAuth(true)">Sign In</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    db.ref('paymentRequests').on('value', snap => {
-        let h = '';
-        snap.forEach(p => {
-            if(p.val().status === 'pending'){
-                h += `<div class="premium-card" style="font-size:12px">
-                    <b>${p.val().email}</b> | ₹${p.val().amt}<br>UTR: ${p.val().utr}
-                    <div class="admin-actions">
-                        <button class="btn-sm" style="background:var(--accent)" onclick="approveUTR('${p.key}','${p.val().uid}',${p.val().amt})">Approve</button>
-                        <button class="btn-sm" style="background:red" onclick="rejectUTR('${p.key}')">Reject</button>
+    <!-- Main Application -->
+    <div id="app">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="sidebar-title">DG PANEL</div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a class="menu-item active" onclick="openPage('home', this)">
+                    <i class="fas fa-bolt"></i>
+                    <span>New Order</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('addfund', this)">
+                    <i class="fas fa-wallet"></i>
+                    <span>Add Funds</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('support', this)">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('profile', this)">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+                
+                <a id="adminBtn" class="menu-item" style="display: none; color: #f87171;" onclick="openPage('admin', this)">
+                    <i class="fas fa-lock"></i>
+                    <span>Admin Panel</span>
+                </a>
+                
+                <a class="menu-item logout" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="menu-toggle" onclick="toggleSidebar(true)">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <div class="wallet-card" onclick="openPage('addfund')">
+                <i class="fas fa-wallet wallet-icon"></i>
+                <div>
+                    <div style="font-size: 12px; color: var(--text-light);">Balance</div>
+                    <div class="wallet-balance">₹<span id="balText">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Page -->
+            <div id="home" class="page active">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-bolt"></i>
                     </div>
-                </div>`;
+                    <div>
+                        <h1 class="page-title">Create New Order</h1>
+                        <p style="color: var(--text-light);">Order social media services instantly</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h2 class="card-title">Order Details</h2>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label class="form-label">Category</label>
+                            <select id="catSelect" class="select-field" onchange="fetchServicesFromAPI()">
+                                <option value="">Select Category</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="YouTube">YouTube</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Twitter">Twitter</option>
+                                <option value="TikTok">TikTok</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-col">
+                            <label class="form-label">Service</label>
+                            <select id="srvSelect" class="select-field" onchange="calculateAutoPrice()">
+                                <option value="">Choose Service</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Link / Username</label>
+                        <input type="text" id="orderLink" placeholder="Paste your profile or post link" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="orderQty" value="100" min="10" step="10" class="input-field" oninput="calculateAutoPrice()">
+                    </div>
+                    
+                    <div class="price-box">
+                        <div class="price-label">Total Amount</div>
+                        <div class="price-amount">₹<span id="totalPrice">0.00</span></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="orderBtn" onclick="placeFinalOrder()">
+                        <i class="fas fa-paper-plane"></i> Place Order Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Support Page -->
+            <div id="support" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">24/7 Support</h1>
+                        <p style="color: var(--text-light);">We're here to help you anytime</p>
+                    </div>
+                </div>
+                
+                <div class="support-grid">
+                    <a href="https://wa.me/917775965170" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>WhatsApp Support</h4>
+                            <p>Instant chat support via WhatsApp</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/dgservice_support" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #0088cc, #006699);">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Telegram Channel</h4>
+                            <p>Join our Telegram for updates & support</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #E4405F, #C13584);">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Instagram</h4>
+                            <p>Follow us on Instagram</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Add Funds Page -->
+            <div id="addfund" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Add Funds</h1>
+                        <p style="color: var(--text-light);">Recharge your wallet instantly</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h2 class="card-title">Payment Details</h2>
+                    </div>
+                    
+                    <div style="background: rgba(99, 102, 241, 0.1); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <i class="fas fa-university" style="color: var(--primary);"></i>
+                            <span style="font-weight: 600;">UPI ID:</span>
+                        </div>
+                        <div style="font-size: 22px; font-weight: 700; color: var(--primary);">aqdaskhan03@fam</div>
+                        <p style="color: var(--text-light); margin-top: 10px; font-size: 14px;">Send payment to this UPI ID and enter UTR below</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount (₹)</label>
+                        <input type="number" id="amtInp" placeholder="Enter amount to add" class="input-field">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="genQR()">
+                        <i class="fas fa-qrcode"></i> Generate Payment QR
+                    </button>
+                    
+                    <div id="qrDiv" style="display: none; text-align: center; margin-top: 25px;">
+                        <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+                            <img id="qrImg" src="" style="width: 200px; height: 200px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">UTR / Transaction ID</label>
+                            <input type="text" id="utrInp" placeholder="Enter UTR from your payment" class="input-field">
+                        </div>
+                        
+                        <button class="btn btn-success-sm" style="width: 100%; padding: 15px; font-size: 16px;" onclick="submitUTR()">
+                            <i class="fas fa-check-circle"></i> Confirm Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">My Profile</h1>
+                        <p style="color: var(--text-light);">Manage your account details</p>
+                    </div>
+                </div>
+                
+                <div class="card profile-card">
+                    <div class="profile-avatar">
+                        <img id="uPfp" src="" alt="Profile Picture">
+                    </div>
+                    
+                    <h2 class="profile-name" id="uName">User</h2>
+                    <p class="profile-email" id="uEmail">user@example.com</p>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--accent);">₹<span id="profileBal">0.00</span></div>
+                            <div style="font-size: 14px; color: var(--text-light);">Balance</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="userStatus">Active</div>
+                            <div style="font-size: 14px; color: var(--text-light);">Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="admin" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Admin Dashboard</h1>
+                        <p style="color: var(--text-light);">Manage users, payments & settings</p>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <h2 class="card-title">Commission Settings</h2>
+                        </div>
+                        
+                        <p style="color: var(--text-light); margin-bottom: 20px;">Set commission percentage added to all service prices</p>
+                        
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div style="flex: 1;">
+                                <input type="number" id="commInput" placeholder="Enter commission percentage" class="input-field" min="0" max="100" step="0.5">
+                            </div>
+                            <button class="btn btn-primary-sm" onclick="updateComm()" style="padding: 14px 25px;">
+                                Update Commission
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h2 class="card-title">User Management</h2>
+                        </div>
+                        
+                        <div id="adminUserList" style="max-height: 400px; overflow-y: auto;">
+                            <!-- User list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <h2 class="card-title">Payment Requests</h2>
+                        </div>
+                        
+                        <div id="adminPayments">
+                            <!-- Payment requests will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="openPage('home', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="nav-label">Home</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('addfund', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="nav-label">Wallet</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('support', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="nav-label">Support</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkWf5kB35rbr6fQp5EJxwZ2bG6xzDlzZQ",
+            authDomain: "otp-service-74871.firebaseapp.com",
+            databaseURL: "https://otp-service-74871-default-rtdb.firebaseio.com"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+        
+        // Constants
+        const MY_UID = "ndjVRXUrm7byZUhfAMnIBhxUA0F3";
+        const BACKEND_URL = "https://dg-otp-backend.onrender.com";
+        let globalComm = 0;
+        
+        // Auth State Listener
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Check if user is blocked
+                db.ref('users/' + user.uid + '/status').on('value', snap => {
+                    if (snap.val() === 'blocked') {
+                        alert("Your account has been blocked!");
+                        auth.signOut();
+                        return;
+                    }
+                    document.getElementById('userStatus').innerText = snap.val() || 'Active';
+                });
+                
+                // Show app, hide auth
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                // Update user profile
+                document.getElementById('uName').innerText = user.displayName || 'User';
+                document.getElementById('uEmail').innerText = user.email;
+                document.getElementById('uPfp').src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.email || 'User') + "&background=6366f1&color=fff";
+                
+                // Load commission
+                db.ref('settings/commission').on('value', snap => {
+                    globalComm = snap.val() || 0;
+                    if (user.uid === MY_UID) {
+                        document.getElementById('commInput').value = globalComm;
+                    }
+                });
+                
+                // Show admin button for admin
+                if (user.uid === MY_UID) {
+                    document.getElementById('adminBtn').style.display = 'flex';
+                    loadAdminPanel();
+                }
+                
+                // Load balance
+                db.ref('users/' + user.uid + '/balance').on('value', snap => {
+                    const balance = (snap.val() || 0).toFixed(2);
+                    document.getElementById('balText').innerText = balance;
+                    document.getElementById('profileBal').innerText = balance;
+                });
+                
+            } else {
+                // Show auth, hide app
+                document.getElementById('authBox').style.display = 'flex';
+                document.getElementById('app').style.display = 'none';
             }
         });
-        document.getElementById('adminPayments').innerHTML = h || 'No pending requests.';
-    });
-}
-
-function approveUTR(key, uid, amt){
-    db.ref('users/'+uid+'/balance').transaction(c => (c||0)+parseFloat(amt));
-    db.ref('paymentRequests/'+key+'/status').set('approved');
-}
-function rejectUTR(key){ if(confirm("Reject?")) db.ref('paymentRequests/'+key).remove(); }
-function editBal(uid){ if(uid === MY_UID) return; let a = prompt("New Bal:"); if(a) db.ref('users/'+uid+'/balance').set(parseFloat(a)); }
-function toggleBlock(uid, s){ if(uid === MY_UID) return; db.ref('users/'+uid+'/status').set(s === 'blocked' ? 'active' : 'blocked'); }
-
-function openPage(id, el){
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    toggleSidebar(false);
-}
-function toggleSidebar(v){ document.getElementById('sidebar').classList.toggle('active', v); }
-function doGoogleAuth() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-function genQR(){
-    document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=aqdaskhan03@fam%26am=${document.getElementById('amtInp').value}%26cu=INR`;
-    document.getElementById('qrDiv').style.display='block';
-}
-function doLogout(){ auth.signOut(); }
-function toggleAuth(l){ document.getElementById('loginForm').style.display = l ? 'block' : 'none'; document.getElementById('signupForm').style.display = l ? 'none' : 'block'; }
-function doLogin(){ auth.signInWithEmailAndPassword(loginEmail.value, loginPass.value).catch(e=>alert(e.message)); }
-function doSignup(){ auth.createUserWithEmailAndPassword(signupEmail.value, signupPass.value).then(r=> db.ref('users/'+r.user.uid).set({email: signupEmail.value, balance: 0, status: 'active'})); }
-
-async function placeFinalOrder() {
-    const srv = document.getElementById('srvSelect');
-    const serviceId = srv.options[srv.selectedIndex].getAttribute('data-id');
-    const link = document.getElementById('orderLink').value;
-    const qty = document.getElementById('orderQty').value;
-    const total = parseFloat(document.getElementById('totalPrice').innerText);
-
-    if(!serviceId || !link || qty < 1) return alert("Fill all fields correctly!");
-    const snap = await db.ref('users/' + auth.currentUser.uid + '/balance').once('value');
-    const currentBal = snap.val() || 0;
-    if(currentBal < total) return alert("Insufficient Balance!");
-
-    document.getElementById('orderBtn').innerText = "Processing...";
-    try {
-        const res = await fetch(`${BACKEND_URL}/place-order`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ service: serviceId, link: link, quantity: qty })
+        
+        // Commission Update
+        function updateComm() {
+            const val = parseFloat(document.getElementById('commInput').value);
+            if (isNaN(val) || val < 0 || val > 100) {
+                alert("Please enter a valid commission percentage (0-100)");
+                return;
+            }
+            
+            db.ref('settings/commission').set(val).then(() => {
+                alert("Commission updated successfully!");
+            }).catch(error => {
+                alert("Error updating commission: " + error.message);
+            });
+        }
+        
+        // Fetch Services from API
+        async function fetchServicesFromAPI() {
+            const category = document.getElementById('catSelect').value;
+            const srvSelect = document.getElementById('srvSelect');
+            
+            if (!category) {
+                srvSelect.innerHTML = '<option value="">Select a category first</option>';
+                return;
+            }
+            
+            srvSelect.innerHTML = '<option value="">Loading services...</option>';
+            
+            try {
+                const res = await fetch(`${BACKEND_URL}/get-services?category=${encodeURIComponent(category)}`);
+                const data = await res.json();
+                
+                if (!data || data.length === 0) {
+                    srvSelect.innerHTML = '<option value="">No services found</option>';
+                    return;
+                }
+                
+                srvSelect.innerHTML = '<option value="">Choose Service</option>';
+                data.forEach(s => {
+                    let apiPrice = parseFloat(s.price) || 0;
+                    let finalPrice = apiPrice + (apiPrice * (globalComm / 100));
+                    srvSelect.innerHTML += `<option value="${finalPrice}" data-id="${s.id}">${s.name} - ₹${finalPrice.toFixed(2)}/1k</option>`;
+                });
+                
+                calculateAutoPrice();
+            } catch (e) {
+                console.error("Error fetching services:", e);
+                srvSelect.innerHTML = '<option value="">Error loading services</option>';
+            }
+        }
+        
+        // Calculate Price
+        function calculateAutoPrice() {
+            const pricePerK = parseFloat(document.getElementById('srvSelect').value) || 0;
+            const quantity = parseFloat(document.getElementById('orderQty').value) || 0;
+            const totalPrice = (pricePerK * (quantity / 1000)).toFixed(2);
+            document.getElementById('totalPrice').innerText = totalPrice;
+        }
+        
+        // Submit UTR
+        function submitUTR() {
+            const amt = document.getElementById('amtInp').value;
+            const utr = document.getElementById('utrInp').value;
+            
+            if (!amt || amt <= 0) {
+                alert("Please enter a valid amount!");
+                return;
+            }
+            
+            if (!utr || utr.trim().length < 8) {
+                alert("Please enter a valid UTR/Transaction ID!");
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            db.ref('paymentRequests').push({
+                uid: user.uid,
+                email: user.email,
+                amt: parseFloat(amt),
+                utr: utr.trim(),
+                status: 'pending',
+                timestamp: Date.now(),
+                name: user.displayName || 'User'
+            }).then(() => {
+                alert("UTR submitted successfully! Admin will approve it soon.");
+                document.getElementById('qrDiv').style.display = 'none';
+                document.getElementById('amtInp').value = '';
+                document.getElementById('utrInp').value = '';
+            }).catch(error => {
+                alert("Error submitting UTR: " + error.message);
+            });
+        }
+        
+        // Load Admin Panel
+        function loadAdminPanel() {
+            // Load users
+            db.ref('users').on('value', snap => {
+                let html = '';
+                
+                snap.forEach(user => {
+                    const data = user.val();
+                    const isSelf = user.key === MY_UID;
+                    
+                    html += `
+                        <div class="admin-user-card">
+                            <div class="user-info">
+                                <h5>${data.email || 'User'}</h5>
+                                <div class="user-details">
+                                    <span>Bal: ₹${(data.balance || 0).toFixed(2)}</span>
+                                    <span>Status: ${data.status || 'Active'}</span>
+                                </div>
+                            </div>
+                            <div class="admin-actions">
+                                ${isSelf ? 
+                                    '<span style="font-size:12px; color:var(--primary); font-weight:600;">(Admin)</span>' : 
+                                    `
+                                    <button class="btn-sm btn-primary-sm" onclick="editBal('${user.key}')">Edit Balance</button>
+                                    <button class="btn-sm ${data.status === 'blocked' ? 'btn-success-sm' : 'btn-warning-sm'}" onclick="toggleBlock('${user.key}', '${data.status || 'active'}')">
+                                        ${data.status === 'blocked' ? 'Unblock' : 'Block'}
+                                    </button>
+                                    `
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('adminUserList').innerHTML = html || '<p style="text-align:center; color:var(--text-light);">No users found</p>';
+            });
+            
+            // Load payment requests
+            db.ref('paymentRequests').orderByChild('status').equalTo('pending').on('value', snap => {
+                let html = '';
+                
+                snap.forEach(payment => {
+                    const data = payment.val();
+                    
+                    html += `
+                        <div class="admin-user-card">
+                            <div class="user-info">
+                                <h5>${data.name || data.email || 'User'}</h5>
+                                <div class="user-details">
+                                    <span>Amount: ₹${data.amt.toFixed(2)}</span>
+                                    <span>UTR: ${data.utr}</span>
+                                    <span>${new Date(data.timestamp).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div class="admin-actions">
+                                <button class="btn-sm btn-success-sm" onclick="approveUTR('${payment.key}', '${data.uid}', ${data.amt})">
+                                    Approve
+                                </button>
+                                <button class="btn-sm btn-danger-sm" onclick="rejectUTR('${payment.key}')">
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('adminPayments').innerHTML = html || '<p style="text-align:center; color:var(--text-light);">No pending payment requests</p>';
+            });
+        }
+        
+        // Admin Functions
+        function approveUTR(key, uid, amt) {
+            if (!confirm(`Approve payment of ₹${amt.toFixed(2)}?`)) return;
+            
+            // Update user balance
+            db.ref('users/' + uid + '/balance').transaction(current => {
+                return (current || 0) + parseFloat(amt);
+            });
+            
+            // Update payment status
+            db.ref('paymentRequests/' + key + '/status').set('approved');
+            
+            alert("Payment approved successfully!");
+        }
+        
+        function rejectUTR(key) {
+            if (!confirm("Reject this payment request?")) return;
+            db.ref('paymentRequests/' + key).remove();
+        }
+        
+        function editBal(uid) {
+            if (uid === MY_UID) {
+                alert("Cannot edit admin balance!");
+                return;
+            }
+            
+            const newBal = prompt("Enter new balance:");
+            if (newBal !== null && !isNaN(parseFloat(newBal))) {
+                db.ref('users/' + uid + '/balance').set(parseFloat(newBal));
+            }
+        }
+        
+        function toggleBlock(uid, currentStatus) {
+            if (uid === MY_UID) {
+                alert("Cannot block admin account!");
+                return;
+            }
+            
+            const newStatus = currentStatus === 'blocked' ? 'active' : 'blocked';
+            const action = newStatus === 'blocked' ? 'Block' : 'Unblock';
+            
+            if (confirm(`${action} this user?`)) {
+                db.ref('users/' + uid + '/status').set(newStatus);
+            }
+        }
+        
+        // Navigation Functions
+        function openPage(pageId, element) {
+            // Update pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update sidebar items
+            if (element) {
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+            
+            // Update bottom nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (pageId === 'home') {
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (pageId === 'addfund') {
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+            } else if (pageId === 'support') {
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            }
+            
+            // Close sidebar on mobile
+            toggleSidebar(false);
+        }
+        
+        function toggleSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            if (show !== undefined) {
+                sidebar.classList.toggle('active', show);
+            } else {
+                sidebar.classList.toggle('active');
+            }
+        }
+        
+        // Auth Functions
+        function doGoogleAuth() {
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+                .catch(error => {
+                    alert("Google sign-in failed: " + error.message);
+                });
+        }
+        
+        function genQR() {
+            const amount = document.getElementById('amtInp').value;
+            
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount first!");
+                return;
+            }
+            
+            const upiId = "aqdaskhan03@fam";
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${encodeURIComponent(upiId)}&am=${amount}&cu=INR&tn=DG Social Service Payment`;
+            
+            document.getElementById('qrImg').src = qrUrl;
+            document.getElementById('qrDiv').style.display = 'block';
+            
+            // Scroll to QR
+            document.getElementById('qrDiv').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function doLogout() {
+            if (confirm("Are you sure you want to logout?")) {
+                auth.signOut();
+            }
+        }
+        
+        function toggleAuth(isLogin) {
+            document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('signupForm').style.display = isLogin ? 'none' : 'block';
+        }
+        
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
+            
+            if (!email || !password) {
+                alert("Please enter both email and password!");
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => {
+                    alert("Login failed: " + error.message);
+                });
+        }
+        
+        function doSignup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPass').value;
+            
+            if (!name || !email || !password) {
+                alert("Please fill all fields!");
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long!");
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(result => {
+                    // Update profile
+                    return result.user.updateProfile({
+                        displayName: name
+                    }).then(() => {
+                        // Create user in database
+                        return db.ref('users/' + result.user.uid).set({
+                            email: email,
+                            name: name,
+                            balance: 0,
+                            status: 'active',
+                            createdAt: Date.now()
+                        });
+                    });
+                })
+                .then(() => {
+                    alert("Account created successfully! You are now logged in.");
+                })
+                .catch(error => {
+                    alert("Signup failed: " + error.message);
+                });
+        }
+        
+        // Place Order
+        async function placeFinalOrder() {
+            const srvSelect = document.getElementById('srvSelect');
+            const serviceId = srvSelect.options[srvSelect.selectedIndex]?.getAttribute('data-id');
+            const link = document.getElementById('orderLink').value;
+            const qty = document.getElementById('orderQty').value;
+            const total = parseFloat(document.getElementById('totalPrice').innerText);
+            
+            // Validation
+            if (!serviceId) {
+                alert("Please select a service!");
+                return;
+            }
+            
+            if (!link || link.trim().length < 3) {
+                alert("Please enter a valid link or username!");
+                return;
+            }
+            
+            if (!qty || qty < 10) {
+                alert("Quantity must be at least 10!");
+                return;
+            }
+            
+            if (total <= 0) {
+                alert("Total price must be greater than 0!");
+                return;
+            }
+            
+            // Check balance
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const balanceSnap = await db.ref('users/' + user.uid + '/balance').once('value');
+            const currentBal = balanceSnap.val() || 0;
+            
+            if (currentBal < total) {
+                alert(`Insufficient balance! You need ₹${total.toFixed(2)} but have only ₹${currentBal.toFixed(2)}`);
+                return;
+            }
+            
+            // Confirm order
+            if (!confirm(`Confirm order for ₹${total.toFixed(2)}?`)) return;
+            
+            // Update button
+            const orderBtn = document.getElementById('orderBtn');
+            const originalText = orderBtn.innerHTML;
+            orderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            orderBtn.disabled = true;
+            
+            try {
+                // Place order with backend
+                const res = await fetch(`${BACKEND_URL}/place-order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        service: serviceId, 
+                        link: link.trim(), 
+                        quantity: qty 
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    // Deduct balance
+                    await db.ref('users/' + user.uid + '/balance').set(currentBal - total);
+                    
+                    // Show success
+                    alert(`Order placed successfully!\nOrder ID: ${data.orderId || 'N/A'}\nAmount: ₹${total.toFixed(2)}\nRemaining Balance: ₹${(currentBal - total).toFixed(2)}`);
+                    
+                    // Reset form
+                    document.getElementById('orderLink').value = '';
+                    document.getElementById('totalPrice').innerText = '0.00';
+                    
+                } else {
+                    alert("Order Error: " + (data.message || "Unknown error"));
+                }
+                
+            } catch (error) {
+                console.error("Order error:", error);
+                alert("Failed to place order. Please try again later.");
+            } finally {
+                // Reset button
+                orderBtn.innerHTML = originalText;
+                orderBtn.disabled = false;
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click outside sidebar to close
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const menuToggle = document.querySelector('.menu-toggle');
+                
+                if (sidebar.classList.contains('active') && 
+                    !sidebar.contains(event.target) && 
+                    !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Close sidebar when clicking on a menu item (for mobile)
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        toggleSidebar(false);
+                    }
+                });
+            });
         });
-        const data = await res.json();
-        if(data.success) {
-            db.ref('users/' + auth.currentUser.uid + '/balance').set(currentBal - total);
-            alert("Order Placed Successfully! Order ID: " + data.orderId);
-        } else { alert("Order Error: " + data.message); }
-    } catch(e) { alert("Backend server error!"); }
-    document.getElementById('orderBtn').innerText = "Place Order";
-}
-</script>
+    </script>
 </body>
 </html>
