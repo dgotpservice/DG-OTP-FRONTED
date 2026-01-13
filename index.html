@@ -5,12 +5,431 @@
     <title>DG SOCIAL SERVICE - Premium Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- INLINE CSS - Pehle yeh use karo -->
+    <style>
+        /* ==================== BASIC STYLES ==================== */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --bg-light: #1e293b;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --card-border: rgba(99, 102, 241, 0.2);
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Auth Screen */
+        #authBox {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg);
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 35px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-google {
+            background: white;
+            color: #333;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .auth-switch {
+            margin-top: 25px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .auth-link {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        /* App Container */
+        #app {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* Simple responsive */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 30px 25px;
+            }
+        }
+
+        /* Error display */
+        #errorDisplay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #ef4444;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            display: none;
+            z-index: 10000;
+        }
+    </style>
 </head>
 <body>
-    <!-- Your existing HTML content -->
-    
-    <!-- Load frontend JavaScript -->
-    <script src="frontend.js"></script>
+    <!-- Error Display -->
+    <div id="errorDisplay"></div>
+
+    <!-- Authentication Screen -->
+    <div id="authBox">
+        <div class="auth-card">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span>DG SOCIAL SERVICE</span>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter your password" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Continue with Google
+                </button>
+                
+                <div class="auth-switch">
+                    New to DG Social Service? 
+                    <span class="auth-link" onclick="toggleAuth(false)">Create Account</span>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signupPass" placeholder="Create a password (min. 6 characters)" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doSignup()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Sign up with Google
+                </button>
+                
+                <div class="auth-switch">
+                    Already have an account? 
+                    <span class="auth-link" onclick="toggleAuth(true)">Sign In</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app">
+        <div style="padding: 50px; text-align: center;">
+            <h1 style="color: var(--primary); margin-bottom: 20px;">Welcome to DG Panel</h1>
+            <p style="color: var(--text-light); margin-bottom: 30px;">Login successful!</p>
+            <button class="btn btn-primary" onclick="doLogout()" style="width: auto; padding: 10px 30px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Inline JavaScript - Pehle yeh use karo -->
+    <script>
+        // ==================== BASIC FUNCTIONS ====================
+        
+        function toggleAuth(isLogin) {
+            document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+            document.getElementById('signupForm').style.display = isLogin ? 'none' : 'block';
+        }
+        
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPass').value;
+            
+            if (!email || !password) {
+                showError('Please enter email and password');
+                return;
+            }
+            
+            console.log('Login attempt:', email);
+            
+            // Simple demo login
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            // Add some demo content
+            document.getElementById('app').innerHTML = `
+                <div style="padding: 20px;">
+                    <h1 style="color: var(--primary); text-align: center; margin-bottom: 30px;">Welcome to DG Panel</h1>
+                    
+                    <div style="background: var(--card-bg); border-radius: 15px; padding: 30px; max-width: 500px; margin: 0 auto;">
+                        <h2 style="color: var(--text); margin-bottom: 20px;">Dashboard</h2>
+                        <p style="color: var(--text-light); margin-bottom: 15px;">Logged in as: ${email}</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                            <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px;">
+                                <div style="font-size: 24px; color: var(--primary); font-weight: bold;">0</div>
+                                <div style="color: var(--text-light); font-size: 14px;">Orders</div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px;">
+                                <div style="font-size: 24px; color: var(--accent); font-weight: bold;">₹0.00</div>
+                                <div style="color: var(--text-light); font-size: 14px;">Balance</div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="doLogout()" style="background: var(--danger); color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 20px;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function doSignup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPass').value;
+            
+            if (!name || !email || !password) {
+                showError('Please fill all fields');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            
+            showMessage('Account created successfully! Redirecting to login...', 'success');
+            
+            setTimeout(() => {
+                toggleAuth(true);
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPass').value = password;
+            }, 1500);
+        }
+        
+        function doGoogleAuth() {
+            showMessage('Google authentication coming soon!', 'info');
+        }
+        
+        function doLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                document.getElementById('app').style.display = 'none';
+                document.getElementById('authBox').style.display = 'flex';
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPass').value = '';
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPass').value = '';
+                toggleAuth(true);
+            }
+        }
+        
+        // ==================== HELPER FUNCTIONS ====================
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorDisplay');
+            errorDiv.textContent = '⚠️ ' + message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.background = '#ef4444';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showMessage(message, type = 'info') {
+            const errorDiv = document.getElementById('errorDisplay');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                errorDiv.style.background = '#10b981';
+            } else if (type === 'error') {
+                errorDiv.style.background = '#ef4444';
+            } else {
+                errorDiv.style.background = '#6366f1';
+            }
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DG Panel loaded successfully');
+            
+            // Test if CSS is working
+            const testDiv = document.createElement('div');
+            testDiv.style.position = 'fixed';
+            testDiv.style.top = '0';
+            testDiv.style.left = '0';
+            testDiv.style.width = '100%';
+            testDiv.style.height = '5px';
+            testDiv.style.background = 'linear-gradient(90deg, #6366f1, #10b981)';
+            testDiv.style.zIndex = '9999';
+            document.body.appendChild(testDiv);
+            
+            setTimeout(() => {
+                testDiv.style.display = 'none';
+            }, 2000);
+            
+            // Check for errors
+            window.onerror = function(msg, url, lineNo, columnNo, error) {
+                showError('JavaScript Error: ' + msg);
+                console.error('Error:', msg, url, lineNo);
+                return false;
+            };
+        });
+    </script>
 </body>
 </html>
