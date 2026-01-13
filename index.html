@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- INLINE CSS - Pehle yeh use karo -->
     <style>
-        /* ==================== BASIC STYLES ==================== */
+        /* ==================== COMPLETE CSS ==================== */
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
@@ -21,6 +20,9 @@
             --card-border: rgba(99, 102, 241, 0.2);
             --text: #f1f5f9;
             --text-light: #94a3b8;
+            --sidebar-bg: #0f172a;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -37,10 +39,23 @@
             overflow-x: hidden;
         }
 
+        /* Glow effects */
+        .glow-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                       radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+        }
+
         /* Auth Screen */
         #authBox {
             height: 100vh;
-            display: flex;
+            display: flex !important;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -56,7 +71,8 @@
             width: 100%;
             max-width: 420px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
+            animation: slideUp 0.5s ease-out;
         }
 
         .logo {
@@ -81,6 +97,10 @@
             font-size: 24px;
         }
 
+        .auth-form {
+            margin-top: 25px;
+        }
+
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -103,7 +123,7 @@
             color: var(--text);
             font-size: 15px;
             outline: none;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .input-field:focus {
@@ -119,7 +139,7 @@
             font-weight: 600;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,34 +189,469 @@
         /* App Container */
         #app {
             display: none;
-            min-height: 100vh;
         }
 
-        /* Simple responsive */
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 260px;
+            height: 100%;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+            padding: 25px 20px;
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-logo {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-user:hover {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info-sidebar {
+            flex: 1;
+        }
+
+        .user-name-sidebar {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .user-email-sidebar {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .menu-item {
+            padding: 12px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .menu-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text);
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--text);
+            border-left: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            width: 20px;
+            font-size: 16px;
+        }
+
+        .menu-item.logout {
+            margin-top: 20px;
+            color: var(--danger);
+            border-left: 3px solid var(--danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Order Form */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .select-field, .input-field {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 18px;
+            padding-right: 45px;
+        }
+
+        .select-field:focus, .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .price-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        .price-amount {
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 24px;
+        }
+
+        /* Support Cards */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .support-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .support-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .support-info p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Profile */
+        .profile-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            margin: 0 auto 20px;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 5px 15px;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .auth-card {
                 padding: 30px 25px;
             }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
 
-        /* Error display */
-        #errorDisplay {
+        /* Alert Box */
+        .alert-box {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #ef4444;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            display: none;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
             z-index: 10000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 300px;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .alert-success { background: #10b981; color: white; }
+        .alert-error { background: #ef4444; color: white; }
+        .alert-warning { background: #f59e0b; color: white; }
+        .alert-info { background: #6366f1; color: white; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Error Display -->
-    <div id="errorDisplay"></div>
+    <div class="glow-effect"></div>
+    <div id="alertContainer"></div>
 
     <!-- Authentication Screen -->
     <div id="authBox">
@@ -271,164 +726,869 @@
 
     <!-- Main Application -->
     <div id="app">
-        <div style="padding: 50px; text-align: center;">
-            <h1 style="color: var(--primary); margin-bottom: 20px;">Welcome to DG Panel</h1>
-            <p style="color: var(--text-light); margin-bottom: 30px;">Login successful!</p>
-            <button class="btn btn-primary" onclick="doLogout()" style="width: auto; padding: 10px 30px;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="sidebar-title">DG PANEL</div>
+            </div>
+            
+            <!-- User Profile in Sidebar -->
+            <div class="sidebar-user" onclick="openPage('profile')">
+                <div class="user-avatar">
+                    <img id="sidebarPfp" src="https://ui-avatars.com/api/?name=DG+User&background=6366f1&color=fff" alt="Profile">
+                </div>
+                <div class="user-info-sidebar">
+                    <div class="user-name-sidebar" id="sidebarName">User</div>
+                    <div class="user-email-sidebar" id="sidebarEmail">user@email.com</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light); font-size: 12px;"></i>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a class="menu-item active" onclick="openPage('home', this)">
+                    <i class="fas fa-bolt"></i>
+                    <span>New Order</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('orders', this)">
+                    <i class="fas fa-list"></i>
+                    <span>Orders</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('refill', this)">
+                    <i class="fas fa-history"></i>
+                    <span>Refill History</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('services', this)">
+                    <i class="fas fa-cogs"></i>
+                    <span>Services</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('tickets', this)">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Tickets</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('api', this)">
+                    <i class="fas fa-code"></i>
+                    <span>API</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('refer', this)">
+                    <i class="fas fa-gift"></i>
+                    <span>Refer & Earn</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('support', this)">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('profile', this)">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+                
+                <a class="menu-item logout" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="menu-toggle" onclick="toggleSidebar(true)">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <div class="wallet-card" onclick="openPage('profile')">
+                <i class="fas fa-wallet wallet-icon"></i>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-light);">Balance</div>
+                    <div class="wallet-balance">₹<span id="balText">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Page -->
+            <div id="home" class="page active">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Create New Order</h1>
+                        <p style="color: var(--text-light);">Order social media services instantly</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h2 class="card-title">Order Details</h2>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label class="form-label">Category</label>
+                            <select id="catSelect" class="select-field" onchange="fetchServicesFromAPI()">
+                                <option value="">Select Category ▼</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="YouTube">YouTube</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Twitter">Twitter</option>
+                                <option value="TikTok">TikTok</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-col">
+                            <label class="form-label">Service</label>
+                            <select id="srvSelect" class="select-field" onchange="calculateAutoPrice()">
+                                <option value="">Choose Service ▼</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Link / Username</label>
+                        <input type="text" id="orderLink" placeholder="Paste your profile or post link" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="orderQty" value="100" min="10" step="10" class="input-field" oninput="calculateAutoPrice()">
+                    </div>
+                    
+                    <div class="price-box">
+                        <div class="price-label">Total Amount</div>
+                        <div class="price-amount">₹<span id="totalPrice">0.00</span></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="orderBtn" onclick="placeFinalOrder()">
+                        <i class="fas fa-paper-plane"></i> Place Order Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Page -->
+            <div id="orders" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">My Orders</h1>
+                        <p style="color: var(--text-light);">View your order history</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h2 class="card-title">Recent Orders</h2>
+                    </div>
+                    
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Service</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersList">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Services Page -->
+            <div id="services" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">All Services</h1>
+                        <p style="color: var(--text-light);">Browse available services</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-th-list"></i>
+                        </div>
+                        <h2 class="card-title">Service Categories</h2>
+                    </div>
+                    
+                    <div id="allServices">
+                        <!-- Services will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Page -->
+            <div id="tickets" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Support Tickets</h1>
+                        <p style="color: var(--text-light);">Manage your support tickets</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h2 class="card-title">Create New Ticket</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" id="ticketSubject" placeholder="Enter ticket subject" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea id="ticketMessage" placeholder="Describe your issue" class="input-field" rows="4"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="createTicket()">
+                        <i class="fas fa-paper-plane"></i> Submit Ticket
+                    </button>
+                </div>
+            </div>
+
+            <!-- API Page -->
+            <div id="api" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">API Documentation</h1>
+                        <p style="color: var(--text-light);">Integrate with our API</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h2 class="card-title">Your API Key</h2>
+                    </div>
+                    
+                    <div class="api-key-box" id="apiKeyDisplay">
+                        Click "Generate API Key" to get started
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="generateAPIKey()">
+                        <i class="fas fa-key"></i> Generate New API Key
+                    </button>
+                </div>
+            </div>
+
+            <!-- Refer & Earn Page -->
+            <div id="refer" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Refer & Earn</h1>
+                        <p style="color: var(--text-light);">Invite friends and earn rewards</p>
+                    </div>
+                </div>
+                
+                <div class="referral-box">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Your Referral Link</h3>
+                    <div class="referral-code" id="referralCode">
+                        Loading...
+                    </div>
+                    <button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 10px 25px;">
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Support Page -->
+            <div id="support" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">24/7 Support</h1>
+                        <p style="color: var(--text-light);">We're here to help you anytime</p>
+                    </div>
+                </div>
+                
+                <div class="support-grid">
+                    <a href="https://wa.me/917775965170" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>WhatsApp Support</h4>
+                            <p>Instant chat support via WhatsApp</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/dgservice_support" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #0088cc, #006699);">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Telegram Channel</h4>
+                            <p>Join our Telegram for updates & support</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #E4405F, #C13584);">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Instagram</h4>
+                            <p>Follow us on Instagram</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">My Profile</h1>
+                        <p style="color: var(--text-light);">Manage your account details</p>
+                    </div>
+                </div>
+                
+                <div class="card profile-card">
+                    <div class="profile-avatar">
+                        <img id="uPfp" src="https://ui-avatars.com/api/?name=DG+User&background=6366f1&color=fff" alt="Profile Picture">
+                    </div>
+                    
+                    <h2 class="profile-name" id="uName">User</h2>
+                    <p class="profile-email" id="uEmail">user@example.com</p>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--accent);">₹<span id="profileBal">0.00</span></div>
+                            <div style="font-size: 14px; color: var(--text-light);">Balance</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="userStatus">Active</div>
+                            <div style="font-size: 14px; color: var(--text-light);">Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="openPage('home', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="nav-label">Home</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('orders', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="nav-label">Orders</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('services', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="nav-label">Services</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('support', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="nav-label">Help</div>
+            </div>
         </div>
     </div>
 
-    <!-- Inline JavaScript - Pehle yeh use karo -->
+    <!-- ==================== COMPLETE JAVASCRIPT ==================== -->
     <script>
-        // ==================== BASIC FUNCTIONS ====================
+        // Configuration
+        const CONFIG = {
+            API_BASE_URL: 'https://backend-9k4m.onrender.com/api',
+            DEMO_MODE: true  // Set to false when backend is ready
+        };
+
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        function showAlert(message, type = 'info', duration = 5000) {
+            // Remove existing alerts
+            document.querySelectorAll('.alert-box').forEach(alert => {
+                alert.remove();
+            });
+            
+            // Create alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-box alert-${type}`;
+            alertDiv.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="background:none; border:none; color:inherit; font-size:20px; cursor:pointer; margin-left:15px;">&times;</button>
+            `;
+            
+            document.getElementById('alertContainer').appendChild(alertDiv);
+            
+            // Auto remove
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, duration);
+        }
         
         function toggleAuth(isLogin) {
             document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
             document.getElementById('signupForm').style.display = isLogin ? 'none' : 'block';
         }
         
-        function doLogin() {
-            const email = document.getElementById('loginEmail').value;
+        // ==================== AUTH FUNCTIONS ====================
+        
+        async function doLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPass').value;
             
             if (!email || !password) {
-                showError('Please enter email and password');
+                showAlert('Please enter email and password', 'error');
                 return;
             }
             
-            console.log('Login attempt:', email);
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+            btn.disabled = true;
             
-            // Simple demo login
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Add some demo content
-            document.getElementById('app').innerHTML = `
-                <div style="padding: 20px;">
-                    <h1 style="color: var(--primary); text-align: center; margin-bottom: 30px;">Welcome to DG Panel</h1>
+            if (CONFIG.DEMO_MODE) {
+                // Demo login
+                setTimeout(() => {
+                    const demoUser = {
+                        uid: 'demo_' + Date.now(),
+                        email: email,
+                        name: email.split('@')[0],
+                        balance: '500.00'
+                    };
                     
-                    <div style="background: var(--card-bg); border-radius: 15px; padding: 30px; max-width: 500px; margin: 0 auto;">
-                        <h2 style="color: var(--text); margin-bottom: 20px;">Dashboard</h2>
-                        <p style="color: var(--text-light); margin-bottom: 15px;">Logged in as: ${email}</p>
+                    localStorage.setItem('user', JSON.stringify(demoUser));
+                    localStorage.setItem('token', 'demo_token_' + Date.now());
+                    localStorage.setItem('loginTime', Date.now());
+                    
+                    showApp(demoUser);
+                    showAlert('Login successful! (Demo Mode)', 'success');
+                    
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                // Real API login
+                try {
+                    const response = await fetch(CONFIG.API_BASE_URL + '/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('loginTime', Date.now());
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-                            <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px;">
-                                <div style="font-size: 24px; color: var(--primary); font-weight: bold;">0</div>
-                                <div style="color: var(--text-light); font-size: 14px;">Orders</div>
-                            </div>
-                            <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px;">
-                                <div style="font-size: 24px; color: var(--accent); font-weight: bold;">₹0.00</div>
-                                <div style="color: var(--text-light); font-size: 14px;">Balance</div>
-                            </div>
-                        </div>
-                        
-                        <button onclick="doLogout()" style="background: var(--danger); color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 20px;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-            `;
+                        showApp(data.user);
+                        showAlert('Login successful!', 'success');
+                    } else {
+                        showAlert(data.error || 'Login failed', 'error');
+                    }
+                } catch (error) {
+                    showAlert('Network error: ' + error.message, 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
         }
         
-        function doSignup() {
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
+        async function doSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPass').value;
             
             if (!name || !email || !password) {
-                showError('Please fill all fields');
+                showAlert('Please fill all fields', 'error');
                 return;
             }
             
             if (password.length < 6) {
-                showError('Password must be at least 6 characters');
+                showAlert('Password must be at least 6 characters', 'error');
                 return;
             }
             
-            showMessage('Account created successfully! Redirecting to login...', 'success');
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            btn.disabled = true;
             
-            setTimeout(() => {
-                toggleAuth(true);
-                document.getElementById('loginEmail').value = email;
-                document.getElementById('loginPass').value = password;
-            }, 1500);
+            if (CONFIG.DEMO_MODE) {
+                setTimeout(() => {
+                    showAlert('Account created successfully! Please sign in.', 'success');
+                    toggleAuth(true);
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginPass').value = password;
+                    
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 1500);
+            } else {
+                try {
+                    const response = await fetch(CONFIG.API_BASE_URL + '/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showAlert('Account created successfully! Please sign in.', 'success');
+                        toggleAuth(true);
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('loginPass').value = password;
+                    } else {
+                        showAlert(data.error || 'Signup failed', 'error');
+                    }
+                } catch (error) {
+                    showAlert('Network error: ' + error.message, 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
         }
         
         function doGoogleAuth() {
-            showMessage('Google authentication coming soon!', 'info');
+            showAlert('Google authentication coming soon!', 'info');
         }
         
         function doLogout() {
             if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
                 document.getElementById('app').style.display = 'none';
                 document.getElementById('authBox').style.display = 'flex';
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPass').value = '';
-                document.getElementById('signupName').value = '';
-                document.getElementById('signupEmail').value = '';
-                document.getElementById('signupPass').value = '';
                 toggleAuth(true);
+                showAlert('Logged out successfully', 'info');
             }
         }
         
-        // ==================== HELPER FUNCTIONS ====================
+        // ==================== APP FUNCTIONS ====================
         
-        function showError(message) {
-            const errorDiv = document.getElementById('errorDisplay');
-            errorDiv.textContent = '⚠️ ' + message;
-            errorDiv.style.display = 'block';
-            errorDiv.style.background = '#ef4444';
+        function showApp(user) {
+            document.getElementById('authBox').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
             
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-        
-        function showMessage(message, type = 'info') {
-            const errorDiv = document.getElementById('errorDisplay');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            if (type === 'success') {
-                errorDiv.style.background = '#10b981';
-            } else if (type === 'error') {
-                errorDiv.style.background = '#ef4444';
-            } else {
-                errorDiv.style.background = '#6366f1';
+            if (user) {
+                document.getElementById('sidebarName').textContent = user.name || user.email.split('@')[0];
+                document.getElementById('sidebarEmail').textContent = user.email;
+                document.getElementById('uName').textContent = user.name || user.email.split('@')[0];
+                document.getElementById('uEmail').textContent = user.email;
+                document.getElementById('profileBal').textContent = user.balance || '0.00';
+                document.getElementById('balText').textContent = user.balance || '0.00';
             }
             
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 3000);
+            // Load initial data
+            loadInitialData();
         }
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DG Panel loaded successfully');
+        function openPage(pageId, element = null) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
             
-            // Test if CSS is working
-            const testDiv = document.createElement('div');
-            testDiv.style.position = 'fixed';
-            testDiv.style.top = '0';
-            testDiv.style.left = '0';
-            testDiv.style.width = '100%';
-            testDiv.style.height = '5px';
-            testDiv.style.background = 'linear-gradient(90deg, #6366f1, #10b981)';
-            testDiv.style.zIndex = '9999';
-            document.body.appendChild(testDiv);
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
             
-            setTimeout(() => {
-                testDiv.style.display = 'none';
-            }, 2000);
+            // Update active menu item
+            if (element) {
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
             
-            // Check for errors
-            window.onerror = function(msg, url, lineNo, columnNo, error) {
-                showError('JavaScript Error: ' + msg);
-                console.error('Error:', msg, url, lineNo);
-                return false;
+            // Load page-specific data
+            if (pageId === 'orders') {
+                loadOrders();
+            } else if (pageId === 'services') {
+                loadServices();
+            }
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+        
+        // ==================== ORDER FUNCTIONS ====================
+        
+        function fetchServicesFromAPI() {
+            const category = document.getElementById('catSelect').value;
+            if (!category) return;
+            
+            const services = {
+                'Instagram': [
+                    { id: 'insta_followers', name: 'Instagram Followers', rate: 20 },
+                    { id: 'insta_likes', name: 'Instagram Likes', rate: 15 },
+                    { id: 'insta_views', name: 'Instagram Views', rate: 10 }
+                ],
+                'YouTube': [
+                    { id: 'yt_subs', name: 'YouTube Subscribers', rate: 50 },
+                    { id: 'yt_likes', name: 'YouTube Likes', rate: 25 },
+                    { id: 'yt_views', name: 'YouTube Views', rate: 30 }
+                ],
+                'Telegram': [
+                    { id: 'tg_members', name: 'Telegram Members', rate: 40 },
+                    { id: 'tg_views', name: 'Telegram Post Views', rate: 20 }
+                ],
+                'Facebook': [
+                    { id: 'fb_likes', name: 'Facebook Likes', rate: 18 },
+                    { id: 'fb_followers', name: 'Facebook Followers', rate: 22 }
+                ],
+                'Twitter': [
+                    { id: 'tw_followers', name: 'Twitter Followers', rate: 35 },
+                    { id: 'tw_likes', name: 'Twitter Likes', rate: 15 }
+                ],
+                'TikTok': [
+                    { id: 'tt_followers', name: 'TikTok Followers', rate: 45 },
+                    { id: 'tt_likes', name: 'TikTok Likes', rate: 20 }
+                ]
             };
+            
+            const serviceSelect = document.getElementById('srvSelect');
+            serviceSelect.innerHTML = '<option value="">Choose Service ▼</option>';
+            
+            if (services[category]) {
+                services[category].forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.textContent = `${service.name} - ₹${service.rate}/1000`;
+                    option.setAttribute('data-rate', service.rate);
+                    serviceSelect.appendChild(option);
+                });
+            }
+            
+            calculateAutoPrice();
+        }
+        
+        function calculateAutoPrice() {
+            const select = document.getElementById('srvSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
+            const quantity = parseInt(document.getElementById('orderQty').value) || 100;
+            
+            const price = (quantity * rate / 1000).toFixed(2);
+            document.getElementById('totalPrice').textContent = price;
+        }
+        
+        function placeFinalOrder() {
+            const service = document.getElementById('srvSelect').value;
+            const link = document.getElementById('orderLink').value.trim();
+            const qty = document.getElementById('orderQty').value;
+            
+            if (!service || !link) {
+                showAlert('Please select service and enter link', 'error');
+                return;
+            }
+            
+            const orderId = 'ORD' + Date.now().toString().slice(-8);
+            showAlert(`Order placed successfully! Order ID: ${orderId}`, 'success');
+            
+            // Reset form
+            document.getElementById('orderLink').value = '';
+            document.getElementById('orderQty').value = '100';
+            document.getElementById('totalPrice').textContent = '0.00';
+            document.getElementById('srvSelect').selectedIndex = 0;
+        }
+        
+        // ==================== OTHER FUNCTIONS ====================
+        
+        function loadInitialData() {
+            // Set demo data
+            document.getElementById('referralCode').textContent = 'DGREF' + Math.floor(Math.random() * 10000);
+            document.getElementById('refCount').textContent = Math.floor(Math.random() * 10);
+            document.getElementById('refEarned').textContent = '₹' + (Math.random() * 500).toFixed(2);
+            document.getElementById('apiKeyDisplay').textContent = 'Click "Generate API Key" to create one';
+        }
+        
+        function loadOrders() {
+            const orders = [
+                { id: 'ORD' + (Date.now() - 1000000).toString().slice(-8), service: 'Instagram Followers', quantity: 1000, amount: '₹20.00', status: 'completed' },
+                { id: 'ORD' + (Date.now() - 2000000).toString().slice(-8), service: 'YouTube Views', quantity: 5000, amount: '₹150.00', status: 'processing' },
+                { id: 'ORD' + (Date.now() - 3000000).toString().slice(-8), service: 'Twitter Followers', quantity: 2000, amount: '₹70.00', status: 'pending' }
+            ];
+            
+            const tbody = document.getElementById('ordersList');
+            if (tbody) {
+                tbody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.service}</td>
+                        <td>${order.quantity}</td>
+                        <td>${order.amount}</td>
+                        <td class="status-${order.status}">${order.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+        
+        function loadServices() {
+            const container = document.getElementById('allServices');
+            if (container) {
+                container.innerHTML = `
+                    <div style="color: var(--text-light);">
+                        <p>Service list will be loaded from backend</p>
+                        <p>Currently in demo mode</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function createTicket() {
+            const subject = document.getElementById('ticketSubject').value.trim();
+            const message = document.getElementById('ticketMessage').value.trim();
+            
+            if (!subject || !message) {
+                showAlert('Please fill subject and message', 'error');
+                return;
+            }
+            
+            showAlert(`Ticket submitted: "${subject}"`, 'success');
+            document.getElementById('ticketSubject').value = '';
+            document.getElementById('ticketMessage').value = '';
+        }
+        
+        function generateAPIKey() {
+            const apiKey = 'dg_' + Math.random().toString(36).substr(2, 16) + '_' + Date.now().toString(36);
+            document.getElementById('apiKeyDisplay').textContent = apiKey;
+            showAlert('New API key generated!', 'success');
+        }
+        
+        function copyReferralLink() {
+            const link = window.location.href + '?ref=' + document.getElementById('referralCode').textContent;
+            
+            navigator.clipboard.writeText(link)
+                .then(() => showAlert('Referral link copied!', 'success'))
+                .catch(() => {
+                    // Fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = link;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showAlert('Referral link copied!', 'success');
+                });
+        }
+        
+        // ==================== INITIALIZATION ====================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DG Panel Initialized');
+            
+            // Check if already logged in
+            const user = localStorage.getItem('user');
+            const loginTime = localStorage.getItem('loginTime');
+            
+            if (user && loginTime) {
+                const hoursSinceLogin = (Date.now() - parseInt(loginTime)) / (1000 * 60 * 60);
+                if (hoursSinceLogin < 24) {
+                    showApp(JSON.parse(user));
+                } else {
+                    localStorage.clear();
+                }
+            }
+            
+            // Initialize default values
+            loadInitialData();
+            
+            // Close sidebar by default
+            document.getElementById('sidebar').classList.remove('active');
+            
+            // Add click outside to close sidebar
+            document.addEventListener('click', function(e) {
+                const sidebar = document.getElementById('sidebar');
+                const menuToggle = document.querySelector('.menu-toggle');
+                
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            // Test backend connection
+            if (!CONFIG.DEMO_MODE) {
+                fetch(CONFIG.API_BASE_URL + '/test')
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Backend connection: OK');
+                        } else {
+                            console.warn('Backend connection: Failed');
+                            showAlert('Backend connection failed. Using demo mode.', 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        console.warn('Backend connection: Failed');
+                        showAlert('Backend connection failed. Using demo mode.', 'warning');
+                    });
+            }
         });
     </script>
 </body>
