@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DG SOCIAL SERVICE - Premium Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External CSS File -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="glow-effect"></div>
+
+    <!-- Authentication Screen -->
+    <div id="authBox">
+        <div class="auth-card">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span>DG SOCIAL SERVICE</span>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter your password" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Continue with Google
+                </button>
+                
+                <div class="auth-switch">
+                    New to DG Social Service? 
+                    <span class="auth-link" onclick="toggleAuth(false)">Create Account</span>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signupPass" placeholder="Create a password (min. 6 characters)" class="input-field">
+                </div>
+                
+                <button class="btn btn-primary" onclick="doSignup()">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button class="btn btn-google" onclick="doGoogleAuth()">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+                    Sign up with Google
+                </button>
+                
+                <div class="auth-switch">
+                    Already have an account? 
+                    <span class="auth-link" onclick="toggleAuth(true)">Sign In</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="sidebar-title">DG PANEL</div>
+            </div>
+            
+            <!-- User Profile in Sidebar -->
+            <div class="sidebar-user" onclick="openPage('profile')">
+                <div class="user-avatar">
+                    <img id="sidebarPfp" src="" alt="Profile">
+                </div>
+                <div class="user-info-sidebar">
+                    <div class="user-name-sidebar" id="sidebarName">User</div>
+                    <div class="user-email-sidebar" id="sidebarEmail">user@email.com</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: var(--text-light); font-size: 12px;"></i>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a class="menu-item active" onclick="openPage('home', this)">
+                    <i class="fas fa-bolt"></i>
+                    <span>New Order</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('orders', this)">
+                    <i class="fas fa-list"></i>
+                    <span>Orders</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('refill', this)">
+                    <i class="fas fa-history"></i>
+                    <span>Refill History</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('services', this)">
+                    <i class="fas fa-cogs"></i>
+                    <span>Services</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('addfund', this)">
+                    <i class="fas fa-wallet"></i>
+                    <span>Deposit</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('tickets', this)">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Tickets</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('api', this)">
+                    <i class="fas fa-code"></i>
+                    <span>API</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('refer', this)">
+                    <i class="fas fa-gift"></i>
+                    <span>Refer & Earn</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('support', this)">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+                
+                <a class="menu-item" onclick="openPage('profile', this)">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+                
+                <a id="adminBtn" class="menu-item" style="display: none; color: #f87171;" onclick="openPage('admin', this)">
+                    <i class="fas fa-lock"></i>
+                    <span>Admin Panel</span>
+                </a>
+                
+                <a class="menu-item logout" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="menu-toggle" onclick="toggleSidebar(true)">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <div class="wallet-card" onclick="openPage('addfund')">
+                <i class="fas fa-wallet wallet-icon"></i>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-light);">Balance</div>
+                    <div class="wallet-balance">₹<span id="balText">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Page -->
+            <div id="home" class="page active">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Create New Order</h1>
+                        <p style="color: var(--text-light);">Order social media services instantly</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h2 class="card-title">Order Details</h2>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label class="form-label">Category</label>
+                            <select id="catSelect" class="select-field" onchange="fetchServicesFromAPI()">
+                                <option value="">Select Category ▼</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="YouTube">YouTube</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Twitter">Twitter</option>
+                                <option value="TikTok">TikTok</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-col">
+                            <label class="form-label">Service</label>
+                            <select id="srvSelect" class="select-field" onchange="calculateAutoPrice()">
+                                <option value="">Choose Service ▼</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Link / Username</label>
+                        <input type="text" id="orderLink" placeholder="Paste your profile or post link" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" id="orderQty" value="100" min="10" step="10" class="input-field" oninput="calculateAutoPrice()">
+                    </div>
+                    
+                    <div class="price-box">
+                        <div class="price-label">Total Amount</div>
+                        <div class="price-amount">₹<span id="totalPrice">0.00</span></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="orderBtn" onclick="placeFinalOrder()">
+                        <i class="fas fa-paper-plane"></i> Place Order Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Page -->
+            <div id="orders" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">My Orders</h1>
+                        <p style="color: var(--text-light);">View your order history</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h2 class="card-title">Recent Orders</h2>
+                    </div>
+                    
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Service</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersList">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Refill History Page -->
+            <div id="refill" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Refill History</h1>
+                        <p style="color: var(--text-light);">Track your refill requests</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h2 class="card-title">Refill Requests</h2>
+                    </div>
+                    
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="refillList">
+                            <!-- Refill history will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Services Page -->
+            <div id="services" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">All Services</h1>
+                        <p style="color: var(--text-light);">Browse available services</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-th-list"></i>
+                        </div>
+                        <h2 class="card-title">Service Categories</h2>
+                    </div>
+                    
+                    <div id="allServices">
+                        <!-- Services will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deposit Page -->
+            <div id="addfund" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Deposit Funds</h1>
+                        <p style="color: var(--text-light);">Recharge your wallet instantly</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h2 class="card-title">Payment Details</h2>
+                    </div>
+                    
+                    <div style="background: rgba(99, 102, 241, 0.1); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <i class="fas fa-university" style="color: var(--primary);"></i>
+                            <span style="font-weight: 600;">UPI ID:</span>
+                        </div>
+                        <div style="font-size: 22px; font-weight: 700; color: var(--primary);">aqdaskhan03@fam</div>
+                        <p style="color: var(--text-light); margin-top: 10px; font-size: 14px;">Send payment to this UPI ID and enter UTR below</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Amount (₹)</label>
+                        <input type="number" id="amtInp" placeholder="Enter amount to add" class="input-field">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="genQR()">
+                        <i class="fas fa-qrcode"></i> Generate Payment QR
+                    </button>
+                    
+                    <div id="qrDiv" style="display: none; text-align: center; margin-top: 25px;">
+                        <div style="background: white; padding: 15px; border-radius: 12px; display: inline-block; margin-bottom: 20px;">
+                            <img id="qrImg" src="" style="width: 200px; height: 200px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">UTR / Transaction ID</label>
+                            <input type="text" id="utrInp" placeholder="Enter UTR from your payment" class="input-field">
+                        </div>
+                        
+                        <button class="btn btn-success-sm" style="width: 100%; padding: 15px; font-size: 16px;" onclick="submitUTR()">
+                            <i class="fas fa-check-circle"></i> Confirm Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Page -->
+            <div id="tickets" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Support Tickets</h1>
+                        <p style="color: var(--text-light);">Manage your support tickets</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h2 class="card-title">Create New Ticket</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" id="ticketSubject" placeholder="Enter ticket subject" class="input-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea id="ticketMessage" placeholder="Describe your issue" class="input-field" rows="4"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="createTicket()">
+                        <i class="fas fa-paper-plane"></i> Submit Ticket
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <h2 class="card-title">My Tickets</h2>
+                    </div>
+                    
+                    <div id="ticketsList">
+                        <!-- Tickets will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Page -->
+            <div id="api" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">API Documentation</h1>
+                        <p style="color: var(--text-light);">Integrate with our API</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h2 class="card-title">Your API Key</h2>
+                    </div>
+                    
+                    <div class="api-key-box" id="apiKeyDisplay">
+                        Loading API key...
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="generateAPIKey()">
+                        <i class="fas fa-key"></i> Generate New API Key
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h2 class="card-title">API Endpoints</h2>
+                    </div>
+                    
+                    <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">GET /services</h4>
+                        <p style="color: var(--text-light); font-size: 14px;">Get list of all available services</p>
+                        <code style="color: var(--accent); font-size: 12px;">{api_url}/get-services?category=Instagram&api_key=YOUR_API_KEY</code>
+                    </div>
+                    
+                    <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 15px;">
+                        <h4 style="color: var(--primary); margin-bottom: 10px;">POST /order</h4>
+                        <p style="color: var(--text-light); font-size: 14px;">Place a new order</p>
+                        <code style="color: var(--accent); font-size: 12px;">{api_url}/place-order (POST with JSON body)</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Refer & Earn Page -->
+            <div id="refer" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Refer & Earn</h1>
+                        <p style="color: var(--text-light);">Invite friends and earn rewards</p>
+                    </div>
+                </div>
+                
+                <div class="referral-box">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">Your Referral Link</h3>
+                    <div class="referral-code" id="referralCode">
+                        Loading...
+                    </div>
+                    <button class="btn btn-primary" onclick="copyReferralLink()" style="width: auto; padding: 10px 25px;">
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h2 class="card-title">Referral Statistics</h2>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="background: rgba(99, 102, 241, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 28px; font-weight: 700; color: var(--primary);" id="refCount">0</div>
+                            <div style="color: var(--text-light); font-size: 14px;">Total Referrals</div>
+                        </div>
+                        
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 28px; font-weight: 700; color: var(--accent);" id="refEarned">₹0.00</div>
+                            <div style="color: var(--text-light); font-size: 14px;">Earned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Page -->
+            <div id="support" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">24/7 Support</h1>
+                        <p style="color: var(--text-light);">We're here to help you anytime</p>
+                    </div>
+                </div>
+                
+                <div class="support-grid">
+                    <a href="https://wa.me/917775965170" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>WhatsApp Support</h4>
+                            <p>Instant chat support via WhatsApp</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/dgservice_support" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #0088cc, #006699);">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Telegram Channel</h4>
+                            <p>Join our Telegram for updates & support</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/dg.service.1?igsh=NXR0bWQ1N24zcGxq" target="_blank" class="support-card">
+                        <div class="support-icon" style="background: linear-gradient(135deg, #E4405F, #C13584);">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <div class="support-info">
+                            <h4>Instagram</h4>
+                            <p>Follow us on Instagram</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">My Profile</h1>
+                        <p style="color: var(--text-light);">Manage your account details</p>
+                    </div>
+                </div>
+                
+                <div class="card profile-card">
+                    <div class="profile-avatar">
+                        <img id="uPfp" src="" alt="Profile Picture">
+                    </div>
+                    
+                    <h2 class="profile-name" id="uName">User</h2>
+                    <p class="profile-email" id="uEmail">user@example.com</p>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--accent);">₹<span id="profileBal">0.00</span></div>
+                            <div style="font-size: 14px; color: var(--text-light);">Balance</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; min-width: 120px;">
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary);" id="userStatus">Active</div>
+                            <div style="font-size: 14px; color: var(--text-light);">Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="admin" class="page">
+                <div class="page-header">
+                    <div class="page-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <h1 class="page-title">Admin Dashboard</h1>
+                        <p style="color: var(--text-light);">Manage users, payments & settings</p>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <h2 class="card-title">Commission Settings</h2>
+                        </div>
+                        
+                        <div class="commission-display">
+                            <div class="commission-value" id="currentCommission">0%</div>
+                            <div class="commission-label">Current Commission Rate</div>
+                        </div>
+                        
+                        <p style="color: var(--text-light); margin-bottom: 20px;">Set commission percentage added to all service prices</p>
+                        
+                        <div class="commission-input-container">
+                            <div class="commission-input-box">
+                                <input type="number" id="commInput" placeholder="Enter commission percentage (e.g., 15.5 for 15.5%)" class="commission-input" min="0" max="100" step="0.5">
+                            </div>
+                            <button class="btn btn-primary-sm" onclick="updateComm()" style="padding: 16px 30px; font-size: 16px;">
+                                Update Commission
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h2 class="card-title">User Management</h2>
+                        </div>
+                        
+                        <div id="adminUserList" style="max-height: 400px; overflow-y: auto;">
+                            <!-- User list will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <h2 class="card-title">Payment Requests</h2>
+                        </div>
+                        
+                        <div id="adminPayments">
+                            <!-- Payment requests will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="openPage('home', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div class="nav-label">Home</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('addfund', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="nav-label">Deposit</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('orders', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="nav-label">Orders</div>
+            </div>
+            
+            <div class="nav-item" onclick="openPage('support', this)">
+                <div class="nav-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="nav-label">Help</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================
+         Load Application Scripts
+         ============================ -->
+    
+    <!-- 1. Security Layer (First) -->
+    <script src="security.js"></script>
+    
+    <!-- 2. Firebase Config (Second) -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- 3. Payment Functions -->
+    <script src="payment.js"></script>
+    
+    <!-- 4. Admin Panel Functions -->
+    <script src="admin-panel.js"></script>
+    
+    <!-- 5. Main Application Logic (Last) -->
+    <script src="app-main.js"></script>
+    
+    <title>DG OTP Protected</title>
+    
+    <!-- 🔴 YEH ADD KARO (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🔴 YEH ADD KARO (Apni CSS file) -->
+    <link rel="stylesheet" href="style.css">
+</body>
+</html>
